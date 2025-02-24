@@ -1,0 +1,23 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}</title>
+
+    <link rel="stylesheet" href="{% static 'web/plugin/bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'web/plugin/fontawesome/css/fontawesome.min.css' %}">
+
+    {% block css %}{% endblock %}
+</head>
+<body>
+    <h1>
+        头部菜单
+    </h1>
+
+    {% block content %}{% endblock %}
+
+    {% block js %}{% endblock %}
+
+</body>
+</html>
