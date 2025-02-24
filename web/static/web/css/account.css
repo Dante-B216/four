@@ -1,0 +1,32 @@
+.account {
+    width: 500px;
+    margin-top: 30px;
+    margin-left: auto;
+    margin-right: auto;
+    border: 1px solid #f0f0f0;
+    padding: 50px 50px 50px 50px;
+    -webkit-box-shadow: 5px 10px 10px rgb(0,0,0,.05);
+    box-shadow: 5px 10px 10px rgb(0,0,0,.05);
+}
+
+.account .title{
+    font-size:25px ;
+    font-weight: bold;
+    text-align: center;
+}
+
+.account .form-group{
+    font-weight: bold;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+.account .btn{
+    margin-top: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.account .form-label{
+    margin-left: 3px;
+}
