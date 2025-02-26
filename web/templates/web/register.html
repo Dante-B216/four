@@ -11,18 +11,18 @@
     <div class="account">
         <div class="title">用户注册</div>
 
-        <form id="form" method="post" novalidate>
+        <form id="regForm" method="post" novalidate>
             {% csrf_token %}
 
             {% for field in form %}
                 <div class="form-group mb-3">
                     <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
                     {{ field }}
-                    <span class="error-msg">{{ field.errors.0 }}</span>
+                    <span class="error-msg"></span>
                 </div>
             {% endfor %}
             <div class="text-center">
-                <button type="submit" class="btn btn-primary">提交</button>
+                <button id="submitBtn" type="button" class="btn btn-primary">提交</button>
             </div>
         </form>
 
@@ -30,5 +30,90 @@
 
 {% endblock %}
 
-{% block js %}{% endblock %}
+{% block js %}
+    <script>
+        // 页面框架加载完成之后自动执行函数
+        $(function () {
+            bindClickSubmitBtn();
+        });
+
+        /*
+        点击提交按钮绑定事件
+         */
+        function bindClickSubmitBtn() {
+            console.log('绑定事件');
+
+            $('#submitBtn').click(function () {
+                console.log('按钮被点击');
+
+                $('.error-msg').empty();
+
+                $.ajax({
+                    url: "/web/register/",
+                    type: "POST",
+                    data: $('#regForm').serialize(),     // 收集表单数据,所有字段+csrf
+                    dataType: "JSON",
+                    success: function (res) {
+                        if (res.status) {
+                            location.href = res.data;
+                        }else{
+                            $.each(res.error,function (key,value) {
+                                console.log(key)
+                                $("#id_"+key).next().text(value[0]);
+
+                            })
+                        }
+                    }
+                })
+
+            })
+
+            {% comment %}console.log('绑定事件');
+
+            $('#submitBtn').click(function () {
+                // event.preventDefault();  // 阻止默认的表单提交行为
+
+                console.log('按钮被点击');
+
+                $('.error-msg').empty();
+
+                // 获取用户名
+                var userName = $('#id_user_name').val();
+
+                var baseUrl = window.location.origin;
+
+                // 发送ajax请求
+                $.ajax({
+                    // 最前面加斜杠表示从根路径开始
+                    // 必须这样写，否则url是http://localhost:8000/web/register/verify/username/
+                    url: "/web/verify/username/",
+                    type: "GET",
+                    data: {user_name: userName, tpl: 'register'},  //发送数据
+                    dataType:"JSON",    //将后端返回的数据反序列化为字典
+                    success: function (res) {
+                        // ajax请求发送成功后，自动执行的函数；res就是后端返回的值
+                        if(res.status === 'true'){
+                            // 继续检验第二个字段
+
+                        }else {
+                            $.each(res.error,function (key,value) {
+                                console.log(key)
+                                $("#id_"+key).next().text(value[0]);
+
+                            })
+                        }
+                    }
+                })
+
+                // 获取邮箱
+                var userEmail = $('id_user_email').val();
+
+                // 获取手机号
+                var userPhone = $('id_user_phone').val();
+            }){% endcomment %}
+
+
+        }
+    </script>
+{% endblock %}
 

@@ -1,0 +1,13 @@
+.navbar{
+    height: 70px;
+}
+
+/* 设置导航链接默认样式 */
+.navbar-nav .nav-link {
+    transition: color 0.3s ease; /* 平滑过渡效果 */
+}
+
+/* 设置导航链接在鼠标悬停时的样式 */
+.navbar-nav .nav-link:hover {
+    text-decoration: underline; /* 添加下划线 */
+}
