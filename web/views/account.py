@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 from django.shortcuts import render, HttpResponse
 from web.forms.account import RegisterModelForm
+from web.forms.account import LoginModelForm
 
 
 def register(request):
@@ -19,6 +20,7 @@ def register(request):
         print(form.errors)
         return JsonResponse({'status': False, 'error': form.errors})
 
+
 # def verify_username(request):
 #     form = verifyUsernameForm(request, data=request.GET)
 #
@@ -27,3 +29,8 @@ def register(request):
 #         return JsonResponse({'status': 'true'})
 #
 #     return JsonResponse({'status': 'false', 'error': form.errors})
+
+# 手机号登录
+def login_phone(request):
+    form = LoginModelForm(request.POST)
+    return render(request, 'web/login_phone.html', {'form': form})

@@ -1,7 +1,7 @@
 import hashlib
 from django.conf import settings
 
-
+# 加密输入的密码
 def md5(string):
     # md5加密
 

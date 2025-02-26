@@ -1,12 +1,13 @@
-from django.core.exceptions import ValidationError
-
 from web import models
 from django import forms
 from django.core.validators import RegexValidator
+from django.core.exceptions import ValidationError
+
 from utils import encrypt
+from web.forms.bootstrap import BootstrapForm
 
 
-class RegisterModelForm(forms.ModelForm):
+class RegisterModelForm(BootstrapForm,forms.ModelForm):
 
     # 用户名验证
     user_name = forms.CharField(
@@ -16,7 +17,7 @@ class RegisterModelForm(forms.ModelForm):
         validators=[
             RegexValidator(
                 regex=r'^[a-zA-Z0-9_-]{6,16}$',  # 正则表达式
-                message='用户名只能包含字母、数字、下划线或短横线，长度为6-16位',
+                message='用户名只能包含字母、数字、下划线或短横线，长度为6-16位。'
             )
         ]
     )
@@ -27,7 +28,7 @@ class RegisterModelForm(forms.ModelForm):
         validators=[
             RegexValidator(
                 regex=r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',  # 正则表达式
-                message='邮箱格式错误'
+                message='邮箱格式错误。'
             )
         ]
     )
@@ -38,7 +39,7 @@ class RegisterModelForm(forms.ModelForm):
         validators=[
             RegexValidator(
                 regex=r'^1[3456789]\d{9}$',  # 正则表达式
-                message='手机号格式错误'
+                message='手机号格式错误。'
             )
         ]
     )
@@ -48,11 +49,13 @@ class RegisterModelForm(forms.ModelForm):
         label='密码',
         min_length=8,
         max_length=32,
-        error_messages={
-            'min_length': "密码长度不能小于8个字符",
-            'max_length': "密码长度不能大于32个字符"
-        },
-        widget=forms.PasswordInput
+        widget=forms.PasswordInput,
+        validators=[
+            RegexValidator(
+                regex=r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,32}$',
+                message="密码必须包含字母、数字，并且长度在8到32个字符之间。"
+            )
+        ]
     )
 
     # 二次输入密码
@@ -60,22 +63,25 @@ class RegisterModelForm(forms.ModelForm):
         label='重复密码',
         min_length=8,
         max_length=32,
-        error_messages={
-            'min_length': "重复密码长度不能小于8个字符",
-            'max_length': "重复密码长度不能大于32个字符"
-        },
-        widget=forms.PasswordInput
+        widget=forms.PasswordInput,
+        validators=[
+            RegexValidator(
+                regex=r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,32}$',
+                message="密码必须包含字母、数字，并且长度在8到32个字符之间。"
+            )
+        ]
     )
 
     class Meta:
         model = models.UserInfo
         fields = '__all__'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for name, field in self.fields.items():
-            field.widget.attrs['class'] = 'form-control'
-            field.widget.attrs['placeholder'] = '请输入%s' % (field.label)
+    # 更改字段样式
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #     for name, field in self.fields.items():
+    #         field.widget.attrs['class'] = 'form-control'
+    #         field.widget.attrs['placeholder'] = '请输入%s' % (field.label)
 
     def clean_user_name(self):
         user_name = self.cleaned_data['user_name']
@@ -107,21 +113,34 @@ class RegisterModelForm(forms.ModelForm):
         return user_phone
 
     def clean_user_pw(self):
-        user_pw = self.cleaned_data['user_pw']
+        if 'user_pw' in self.cleaned_data:
+            # 字段存在，可以继续处理
+            user_pw = self.cleaned_data['user_pw']
+            # 加密并返回
+            return encrypt.md5(user_pw)
+        else:
+            # 字段不存在，进行处理
+            # 你可以选择抛出异常或者做其他处理
+            raise ValidationError("密码格式错误。")
 
-        # 加密并返回
-        return encrypt.md5(user_pw)
+
 
     def clean_confirm_user_pw(self):
-        user_pw = self.cleaned_data['user_pw']
+        if ('user_pw' in self.cleaned_data) and ('confirm_user_pw' in self.cleaned_data):
+            # 字段存在，可以继续处理
+            user_pw = self.cleaned_data['user_pw']
 
-        confirm_user_pw = encrypt.md5(self.cleaned_data['confirm_user_pw'])
+            confirm_user_pw = encrypt.md5(self.cleaned_data['confirm_user_pw'])
 
-        if confirm_user_pw != user_pw:
-            raise ValidationError('两次密码不一致')
+            if confirm_user_pw != user_pw:
+                raise ValidationError('两次密码不一致')
 
-        return confirm_user_pw
+            return confirm_user_pw
 
+        else:
+            # 字段不存在，进行处理
+            # 你可以选择抛出异常或者做其他处理
+            raise ValidationError("请先输入符合格式的密码，再重复密码输入。")
 
 
 # class verifyUsernameForm(forms.Form):
@@ -159,3 +178,34 @@ class RegisterModelForm(forms.ModelForm):
 #
 #
 #     pass
+
+class LoginModelForm(BootstrapForm,forms.Form):
+    user_phone = forms.CharField(
+        label='手机号',
+        validators=[
+            RegexValidator(
+                regex=r'^1[3456789]\d{9}$',  # 正则表达式
+                message='手机号格式错误。'
+            )
+        ]
+    )
+
+    user_pw = forms.CharField(
+        label='密码',
+        min_length=8,
+        max_length=32,
+        widget=forms.PasswordInput,
+        validators=[
+            RegexValidator(
+                regex=r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,32}$',
+                message="密码必须包含字母、数字，并且长度在8到32个字符之间。"
+            )
+        ]
+    )
+
+    # 更改字段样式
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #     for name, field in self.fields.items():
+    #         field.widget.attrs['class'] = 'form-control'
+    #         field.widget.attrs['placeholder'] = '请输入%s' % (field.label)

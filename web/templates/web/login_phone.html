@@ -1,0 +1,80 @@
+{% extends 'web/layout/basic.html' %}
+{% load static %}
+
+{% block title %}用户登录{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'web/css/login.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="account">
+        <div class="title">手机号登录</div>
+
+        <form id="phoneForm" method="post" novalidate>
+            {% csrf_token %}
+
+            {% for field in form %}
+                <div class="form-group mb-3">
+                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                    {{ field }}
+                    <span class="error-msg"></span>
+                </div>
+            {% endfor %}
+            <div>
+                <button id="loginBtn" type="button" class="btn btn-primary">登录</button>
+            </div>
+        </form>
+
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script>
+        // 页面框架加载完成之后自动执行函数
+        $(function () {
+            bindClickSubmitBtn();
+        });
+
+        /*
+        点击提交按钮绑定事件
+         */
+        function bindClickSubmitBtn() {
+            console.log('绑定事件')
+
+            $('#submitBtn').click(function () {
+                console.log('按钮被点击')
+
+                $('.error-msg').empty();
+
+                console.log('清空原信息')
+
+                $.ajax({
+                    url: "/web/register/",
+                    type: "POST",
+                    data: $('#regForm').serialize(),     // 收集表单数据,所有字段+csrf
+                    dataType: "JSON",
+                    success: function (res) {
+                        if (res.status) {
+                            location.href = res.data;
+                        } else {
+                            console.log('错误字段')
+                            $.each(res.error, function (key, value) {
+                                $("#id_" + key).next().text(value[0]);
+
+                            })
+                        }
+                    }
+                })
+                console.log('发送ajax请求')
+
+            })
+
+
+
+
+        }
+    </script>
+{% endblock %}
+

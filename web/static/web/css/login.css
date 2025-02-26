@@ -1,0 +1,43 @@
+.account {
+    width: 550px;
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    border: 1px solid #f0f0f0;
+    padding: 45px 50px 45px 50px;
+    -webkit-box-shadow: 5px 10px 10px rgb(0,0,0,.05);
+    box-shadow: 5px 10px 10px rgb(0,0,0,.05);
+}
+
+.account .title{
+    font-size:25px ;
+    font-weight: bold;
+    text-align: center;
+}
+
+.account .form-group{
+    font-weight: bold;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+.account .btn{
+    margin-top: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-left: 50px;
+}
+
+.account .form-label{
+    margin-left: 3px;
+    margin-top: 10px;
+}
+
+.account .error-msg{
+    font-weight: normal;
+    font-size: 14px;
+    color: rgb(219,26,33);
+    margin-left: 3px;
+    margin-top: 3px;
+    position: absolute;
+}
