@@ -9,9 +9,9 @@
 
 {% block content %}
     <div class="account">
-        <div class="title">手机号登录</div>
+        <div class="title">邮箱登录</div>
 
-        <form id="phoneForm" method="post" novalidate>
+        <form id="emailForm" method="post" novalidate>
             {% csrf_token %}
 
             {% for field in form %}
@@ -43,8 +43,8 @@
                         <button id="loginBtn" type="button" class="btn btn-primary">登录</button>
                     </div>
                     <div class=" col-6">
+                        <a href="/web/login/user_phone/" class="jump btn btn-link me-3">点击跳转手机号登录</a>
                         <a href="/web/login/user_name/" class="jump btn btn-link me-3">点击跳转用户名登录</a>
-                        <a href="/web/login/user_email/" class="jump btn btn-link me-3">点击跳转邮箱登录</a>
                     </div>
                 </div>
             </div>
@@ -103,12 +103,12 @@
                 const csrftoken = getCookie('csrftoken');
 
                 $.ajax({
-                    url: "/web/login/user_phone/",
+                    url: "/web/login/user_email/",
                     type: "POST",
                     headers: {
                         'X-CSRFToken': csrftoken
                     },
-                    data: $('#phoneForm').serialize(),     // 收集表单数据,所有字段+csrf
+                    data: $('#emailForm').serialize(),     // 收集表单数据,所有字段+csrf
                     dataType: "JSON",
                     success: function (res) {
                         if (res.status) {
