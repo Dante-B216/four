@@ -12,4 +12,7 @@ urlpatterns = [
     path('login/user_phone/', account.login_phone, name='login_phone'),
     path('login/user_name/', account.login_name, name='login_name'),
     path('login/user_email/', account.login_email, name='login_email'),
+
+    path('logout/', account.logout, name='logout'),
+    path('index/',account.index,name='index'),
 ]

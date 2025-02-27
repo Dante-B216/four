@@ -1,7 +1,7 @@
 from django.contrib.auth.hashers import check_password
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse
-from django.shortcuts import render, HttpResponse
+from django.shortcuts import render, HttpResponse, redirect
 
 import web
 from web import models
@@ -22,7 +22,7 @@ def register(request):
         print(form.cleaned_data)
         # 验证通过，写入数据库（密码加密）
         instance = form.save()
-        return JsonResponse({'status': True, 'data': '/web/login'})
+        return JsonResponse({'status': True, 'data': '/web/login/user_name/'})
     else:
         print("form not_valid")
         print(form.errors)
@@ -64,6 +64,9 @@ def login_phone(request):
 
         # 如果输入的密码和数据库用户密码一样
         if user.user_pw == user_pw:
+            # 存储用户ID到session
+            request.session['user_id'] = user.id
+
             return JsonResponse({'status': True, 'data': '/web/index'})     # 跳转首页
         else:
             return JsonResponse({'status': False, 'error': {'user_pw': ['密码错误。']}})     # 在user_pw下面报错：密码错误。
@@ -119,6 +122,9 @@ def login_name(request):
 
         # 如果输入的密码和数据库用户密码一样
         if user.user_pw == user_pw:
+            # 存储用户ID到session
+            request.session['user_id'] = user.id
+
             return JsonResponse({'status': True, 'data': '/web/index'})     # 跳转首页
         else:
             return JsonResponse({'status': False, 'error': {'user_pw': ['密码错误。']}})     # 在user_pw下面报错：密码错误。
@@ -153,6 +159,9 @@ def login_email(request):
 
         # 如果输入的密码和数据库用户密码一样
         if user.user_pw == user_pw:
+            # 存储用户ID到session
+            request.session['user_id'] = user.id
+
             return JsonResponse({'status': True, 'data': '/web/index'})  # 跳转首页
         else:
             return JsonResponse({'status': False, 'error': {'user_pw': ['密码错误。']}})  # 在user_pw下面报错：密码错误。
@@ -161,3 +170,11 @@ def login_email(request):
         print("form not_valid")
         print(form.errors)
         return JsonResponse({'status': False, 'error': form.errors})  # 把错误显示在表单上
+
+# 退出
+def logout(request):
+    request.session.flush()
+    return redirect('/web/index')
+
+def index(request):
+    return render(request, 'web/index.html')

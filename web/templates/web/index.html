@@ -1,0 +1,26 @@
+{% extends 'web/layout/basic.html' %}
+{% load static %}
+
+{% block title %}首页{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'web/css/account.css' %}">
+    <style>
+        .bk_img img {
+            width: auto;  /* 设置宽度为 100%，根据父元素的宽度调整 */
+            max-width: 100%; /* 确保图片不会超出父元素的宽度 */
+            height: auto;  /* 高度自动调整，保持比例 */
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="bk_img">
+        <img src="{% static 'web/img/bg_img.jpg' %}" alt="Background Image">
+    </div>
+{% endblock %}
+
+{% block js %}
+
+{% endblock %}
+
