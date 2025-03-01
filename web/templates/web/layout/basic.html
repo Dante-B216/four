@@ -15,6 +15,31 @@
 
     <script src="{% static 'web/js/jquery.js' %}"></script>
 
+    <style>
+        .footer {
+            background-color: #f8f9fa;
+            color: #404040;
+            text-align: center;
+            padding: 0;
+            font-size: 16px;
+            height: 70px; /* 设置 footer 的高度 */
+            display: flex;
+            justify-content: center; /* 水平居中 */
+            align-items: center; /* 垂直居中 */
+        }
+
+        .footer .tex1 {
+            text-decoration: none;
+            margin-bottom: 0px;
+            margin-right: 30px;
+        }
+        .footer .tex2 {
+            text-decoration: none;
+            margin-bottom: 0px;
+        }
+
+    </style>
+
     {% block css %}{% endblock %}
 </head>
 <body>
@@ -76,6 +101,11 @@
     {% block content %}
 
     {% endblock %}
+
+{#    <footer class="footer">#}
+{#        <p class="tex1">202125310617计算机6班苏埼丹</p>#}
+{#        <p class="tex2">时间：2025年2月</p>#}
+{#    </footer>#}
 
     {% block js %}{% endblock %}
 
