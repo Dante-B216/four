@@ -1,6 +1,7 @@
 from django.urls import include, path
 
 from web.views import account
+from web.views import project
 
 app_name = 'web'
 
@@ -14,5 +15,8 @@ urlpatterns = [
     path('login/user_email/', account.login_email, name='login_email'),
 
     path('logout/', account.logout, name='logout'),
-    path('index/',account.index,name='index'),
+    path('index/', account.index, name='index'),
+
+    path('project/add/', project.project_add, name='project_add'),
+    path('project/list/', project.project_list, name='project_list'),
 ]

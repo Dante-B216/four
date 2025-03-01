@@ -1,0 +1,19 @@
+.form-group{
+    font-weight: bold;
+    margin-bottom: 30px !important;
+    margin-top: 0px;
+}
+
+.form-label{
+    margin-left: 3px;
+    margin-top: 10px;
+}
+
+.error-msg{
+    font-weight: normal;
+    font-size: 14px;
+    color: rgb(219,26,33);
+    margin-left: 3px;
+    margin-top: 3px;
+    position: absolute;
+}

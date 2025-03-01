@@ -28,7 +28,7 @@ class Project(models.Model):
 
     description = models.TextField(verbose_name='项目描述', max_length=300)
 
-    color = models.SmallIntegerField(verbose_name='项目颜色', choices=COLOR_CHOICES)
+    color = models.SmallIntegerField(verbose_name='项目颜色', choices=COLOR_CHOICES, default=1)
 
     star = models.BooleanField(verbose_name='项目星标', default=False)
 

@@ -1,0 +1,87 @@
+{% extends 'web/layout/basic.html' %}
+{% load static %}
+
+{% block title %}添加项目{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'web/css/project.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="modal fade" id="addFormModal" tabindex="-1" aria-labelledby="addFormModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5">创建图像分割项目</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <form id="addForm">
+                    {% csrf_token %}
+                        {% for field in form %}
+                            <div class="form-group mb-3">
+                                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                {{ field }}
+                                <span class="error-msg"></span>
+                            </div>
+                        {% endfor %}
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button id="submitBtn" type="button" class="btn btn-primary">确定并进入图像分割中心</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+
+{% block js %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var myModal = new bootstrap.Modal(document.getElementById('addFormModal'), {
+                keyboard: false
+            });
+            myModal.show();
+        });
+
+
+        $(function () {
+            bindSubmitBtn();
+        });
+
+        function bindSubmitBtn(){
+            console.log("绑定事件")
+            $('#submitBtn').click(function () {
+                console.log("按钮被点击")
+                $.ajax({
+                    url:"/web/project/add/",
+                    type:"POST",
+                    data:$('#addForm').serialize(),
+                    dataType:"JSON",
+                    success:function (res) {
+                        console.log(res)
+                        if(res.status){
+                            //页面主动刷新
+                            //location.href=location.href;
+
+                            // 跳转图像分割中心
+                        }else {
+                            console.log('错误字段')
+                            $.each(res.error, function (key, value) {
+                                $("#id_" + key).next().text(value[0]);
+
+                            })
+                        }
+                    }
+                })
+            })
+        }
+    </script>
+{% endblock %}
