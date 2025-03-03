@@ -4,15 +4,68 @@
 {% block title %}项目列表{% endblock %}
 
 {% block css %}
-    <link rel="stylesheet" href="{% static 'web/css/account.css' %}">
+    <link rel="stylesheet" href="{% static 'web/css/project.css' %}">
 {% endblock %}
 
 {% block content %}
-    
+    <div class="project container-fluid">
+
+        <div class="card">
+            <div class="card-header">
+                <i class="fa-solid fa-star"></i>
+                星标项目
+            </div>
+            <div class="card-body">
+                {% for item in project_dict.star %}
+                    <div class="item">
+                        <a href="/web/project/manage/{{ item.id }}/" class="title"
+                           style="background-color: {{ item.get_color_display }};">{{ item.name }}</a>
+                        <div class="info">
+                            <div>
+                                <a href="/web/project/delete_star/my/{{ item.id }}/">
+                                    <i class="fa-solid fa-star" aria-hidden="true" style="color: #FCD53F"></i>
+                                </a>
+                                <span>{{ item.project_time }}</span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <i class="fa-solid fa-list"></i>
+                我创建的项目
+            </div>
+            <div id="projectItem" class="card-body">
+                {% for item in project_dict.my %}
+                    <div class="item">
+                        <a href="/web/project/manage/{{ item.id }}/" class="title"
+                           style="background-color: {{ item.get_color_display }};">{{ item.name }}</a>
+                        <div class="info">
+                            <div>
+                                <a href="/web/project/star/my/{{ item.id }}/">
+                                    <i class="fa-solid fa-star" aria-hidden="true" style="color: #d5d5d5"></i>
+                                </a>
+                                <span>{{ item.project_time }}</span>
+                            </div>
+
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+
 {% endblock %}
 
 
 
 {% block js %}
+
 
 {% endblock %}

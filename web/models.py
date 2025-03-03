@@ -17,11 +17,11 @@ class Project(models.Model):
     COLOR_CHOICES = (
         (1, "#56b8eb"),
         (2, "#f28033"),
-        (3, "ebc656"),
-        (4, "a2d148"),
-        (5, "20bfa4"),
-        (6, "7461c2"),
-        (7, "20bfa3"),
+        (3, "#ebc656"),
+        (4, "#a2d148"),
+        (5, "#20bfa4"),
+        (6, "#7461c2"),
+        (7, "#20bfa3"),
     )
 
     name = models.CharField(verbose_name='项目名称', max_length=32)
