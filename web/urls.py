@@ -28,11 +28,17 @@ urlpatterns = [
     # 首页
     path('index/', account.index, name='index'),
 
+    # 帮助文档
+    path('help/', account.help, name='help'),
+
     # 创建项目
     path('project/add/', project.project_add, name='project_add'),
 
     # 展示项目
     path('project/list/', project.project_list, name='project_list'),
+
+    # wiki
+    path('project/wiki/', project.project_wiki, name='project_wiki'),
 
     # 星标项目
     re_path('project/star/(?P<project_type>\w+)/(?P<project_id>\d+)/', project.project_star, name='project_star'),

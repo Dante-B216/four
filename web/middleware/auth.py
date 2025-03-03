@@ -3,7 +3,7 @@ from django.shortcuts import redirect
 from web import models
 from django.conf import settings
 
-
+# 中间件
 class AuthMiddleware(MiddlewareMixin):
     def process_request(self, request):
         """

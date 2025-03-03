@@ -178,3 +178,6 @@ def logout(request):
 
 def index(request):
     return render(request, 'web/index.html')
+
+def help(request):
+    return render(request, 'web/help.html')

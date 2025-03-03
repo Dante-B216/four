@@ -1,0 +1,5 @@
+{% for item in data_list %}
+<li>
+    <a class="{{ item.class }}"  aria-current="page" href="{{ item.url }}">{{ item.title }}</a>
+</li>
+{% endfor %}
