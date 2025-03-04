@@ -2,7 +2,6 @@ from django.db import models
 
 
 class UserInfo(models.Model):
-
     user_name = models.CharField(verbose_name='用户名', max_length=32, db_index=True)  # db_index=True创建索引
 
     user_email = models.EmailField(verbose_name='邮箱', max_length=32)  # 内置正则表达式
@@ -13,7 +12,6 @@ class UserInfo(models.Model):
 
 
 class Project(models.Model):
-
     COLOR_CHOICES = (
         (1, "#56b8eb"),
         (2, "#f28033"),
@@ -38,7 +36,6 @@ class Project(models.Model):
 
 
 class OriginalImage(models.Model):
-
     original_img = models.ImageField(verbose_name='本地上传图像')
 
     original_img_time = models.DateTimeField(verbose_name='上传时间', auto_now_add=True)
@@ -47,7 +44,6 @@ class OriginalImage(models.Model):
 
 
 class SegmentationResult(models.Model):
-
     MODEL_CHOICES = (
         (1, "unet"),
         (2, "unet_c"),
@@ -64,3 +60,18 @@ class SegmentationResult(models.Model):
     result_img_time = models.DateTimeField(verbose_name='分割完成时间', auto_now_add=True)
 
     original_img = models.ForeignKey(OriginalImage, on_delete=models.CASCADE)  # 外键
+
+
+class Wiki(models.Model):
+    page_title = models.CharField(verbose_name='文章标题', max_length=255)
+
+    page_content = models.TextField(verbose_name='文章内容')
+
+    page_time = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)  # 仅在创建时设置
+
+    update_time = models.DateTimeField(verbose_name='更新时间', auto_now=True)  # 每次修改时更新
+
+    user = models.ForeignKey(UserInfo, on_delete=models.CASCADE)  # 外键
+
+    # 自关联
+    parent = models.ForeignKey('Wiki', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
