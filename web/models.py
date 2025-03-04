@@ -67,11 +67,21 @@ class Wiki(models.Model):
 
     page_content = models.TextField(verbose_name='文章内容')
 
+    # auto_now_add=True：当Wiki实例第一次创建时，page_time字段会自动设置为当前时间
     page_time = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)  # 仅在创建时设置
 
+    # auto_now=True：每次保存模型实例时都会更新为当前时间
     update_time = models.DateTimeField(verbose_name='更新时间', auto_now=True)  # 每次修改时更新
 
     user = models.ForeignKey(UserInfo, on_delete=models.CASCADE)  # 外键
 
     # 自关联
-    parent = models.ForeignKey('Wiki', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
+    # null=True, blank=True：这些参数允许parent字段为空
+    parent = models.ForeignKey('Wiki', on_delete=models.CASCADE, null=True, blank=True, related_name='children',
+                               verbose_name='父文章')
+
+    # 深度
+    depth = models.IntegerField(verbose_name='深度', default=1)
+
+    def __str__(self):
+        return self.page_title

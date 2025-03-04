@@ -1,0 +1,95 @@
+{% extends 'web/layout/basic.html' %}
+{% load static %}
+
+{% block title %}wiki{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'web/css/wiki.css' %}">
+{% endblock %}
+
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="card">
+
+            <div class="card-header">
+                <div class="head">
+                    <i class="fa-solid fa-book"></i>
+                    wiki文档
+                </div>
+                <div class="function">
+                    <a type="button" class="btn btn-success btn-sm" href="/web/{{ request.tracer.id }}/wiki/add/">
+                        <i class="fa-solid fa-circle-plus"></i>
+                        新建
+                    </a>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div class="col-sm-3 title-list">
+                    <ul id="catalog">
+
+                    </ul>
+                </div>
+
+                <div class="col-sm-6 content">
+                    {% if wiki_object %}
+
+                        {{ wiki_object.page_content }}
+
+                    {% else %}
+                        <div style="text-align: center;margin-top: 150px">
+                            <h4 style="font-weight: bolder">{{ request.tracer.user_name }}のwiki文档库</h4>
+                            <a href="{% url 'web:wiki_add' user_id=request.tracer.id %}">
+                                <i class="fa-solid fa-circle-plus"></i>
+                                新建文章
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        var WIKI_DETAIL_URL = "{% url 'web:wiki' user_id=request.tracer.id %}";     //全局变量
+
+        $(function () {
+            initCatalog();      //初始化多级目录
+        });
+
+        function initCatalog() {
+            $.ajax({
+                url: "{% url 'web:wiki_catalog' user_id=request.tracer.id %}",
+                type: "GET",
+                dataType: "JSON",
+                success: function (res) {
+                    console.log(res);
+                    if (res.status) {
+                        $.each(res.data, function (index, item) {
+                            //item={'id': 1, 'page_title': '病人01', 'parent_id': None}
+                            var href = WIKI_DETAIL_URL + "?wiki_id=" + item.id;     //文章访问路径
+
+                            var li = $("<li>").attr("id", "id_" + item.id).append($("<a>").text(item.page_title).attr("href", href)).append($("<ul>"));
+
+                            if (!item.parent_id) {
+
+                                $("#catalog").append(li);
+
+                            } else {
+
+                                $("#id_" + item.parent_id).children("ul").append(li);
+                            }
+                        })
+                    } else {
+                        alert("初始化目录失败。")
+                    }
+                }
+            })
+        }
+    </script>
+
+{% endblock %}

@@ -62,6 +62,3 @@ def project_image_segmentation(request, project_id):
 def project_manage(request, project_id):
     return render(request, "web/project_manage.html")
 
-
-def project_wiki(request):
-    return render(request, "web/project_wiki.html")

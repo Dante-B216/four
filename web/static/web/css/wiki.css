@@ -1,0 +1,70 @@
+.card{
+    margin-top: 10px;
+}
+
+.card-header {
+    display: flex; /* 使用 flexbox 布局 */
+    flex-direction: row;
+    justify-content: space-between; /* 将子元素分别放在左右两端 */
+    align-items: center; /* 垂直居中对齐 */
+}
+
+.head {
+    /* 左侧内容样式 */
+}
+
+.function {
+    /* 右侧内容样式 */
+}
+
+.function .btn{
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.card-body {
+    display: flex; /* 使用Flexbox布局 */
+}
+
+.title-list{
+    flex: 1; /* 目录占据1份空间 */
+    border-right: 1px solid #dddddd;
+    min-height: 500px;
+}
+
+.title-list ul{
+    padding-left: 15px;
+}
+
+.title-list ul a{
+    display: block;
+    padding: 5px 0;
+}
+
+.content{
+    flex: 3; /* 内容占据2份空间 */
+    border-left: 1px solid #dddddd;
+    min-height: 600px;
+    padding-left: 16px; /* 内边距 */
+    margin-left: -1px;
+}
+
+.card-body .content .form-group .form-label{
+    margin-left: 3px;
+    margin-top: 10px;
+}
+
+.card-body .content .form-group{
+    font-weight: bold;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+.card-body .content .form-group .error-msg{
+    font-weight: normal;
+    font-size: 14px;
+    color: rgb(219,26,33);
+    margin-left: 3px;
+    margin-top: 3px;
+    position: absolute;
+}
