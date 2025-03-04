@@ -1,3 +1,5 @@
+from collections import deque
+
 from django.db import models
 
 
@@ -85,3 +87,14 @@ class Wiki(models.Model):
 
     def __str__(self):
         return self.page_title
+
+    # 父节点depth修改后，修改所有子节点的depth
+    def update_children_depth(self):
+        queue = deque([self])
+        while queue:
+            current_node = queue.popleft()
+            children = current_node.children.all()
+            for child in children:
+                child.depth = current_node.depth + 1
+                child.save(update_fields=['depth'])
+                queue.append(child)

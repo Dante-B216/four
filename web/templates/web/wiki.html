@@ -19,9 +19,48 @@
                 </div>
                 <div class="function">
                     <a type="button" class="btn btn-success btn-sm" href="/web/{{ request.tracer.id }}/wiki/add/">
-                        <i class="fa-solid fa-circle-plus"></i>
+                        <i class="fa-solid fa-square-plus"></i>
                         新建
                     </a>
+                    {% if wiki_object %}
+                        <a type="button" class="btn btn-primary btn-sm"
+                           href="/web/{{ request.tracer.id }}/wiki/edit/{{ wiki_object.id }}">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                            编辑
+                        </a>
+                        <a type="button" class="btn btn-danger btn-sm"
+                           data-bs-toggle="modal" data-bs-target="#deleteModal">
+                            <i class="fa-solid fa-trash-can"></i>
+                            删除
+                        </a>
+
+                        <!-- 删除确认模态框 -->
+                        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel"
+                             aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel"
+                                            style="font-size: 16px;font-weight: bolder ">确认删除</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body" style="font-size: 14px">
+                                        确定删除？删除后无法恢复！
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                                                style="font-size: 14px">取消
+                                        </button>
+                                        <button type="button" class="btn btn-danger" id="confirmDeleteButton"
+                                                style="font-size: 14px">确定
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    {% endif %}
                 </div>
             </div>
 
@@ -55,6 +94,7 @@
 
 {% block js %}
     <script>
+
         var WIKI_DETAIL_URL = "{% url 'web:wiki' user_id=request.tracer.id %}";     //全局变量
 
         $(function () {
@@ -90,6 +130,16 @@
                 }
             })
         }
+
+        const tracerId = '{{ request.tracer.id }}';
+        const wikiId = '{{ wiki_object.id }}';
+
+        // 监听确认删除按钮的点击事件
+        document.getElementById('confirmDeleteButton').addEventListener('click', () => {
+            // 跳转到删除 URL
+            window.location.href = `/web/${tracerId}/wiki/delete/${wikiId}/`;
+        });
+
     </script>
 
 {% endblock %}

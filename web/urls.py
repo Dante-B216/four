@@ -47,6 +47,12 @@ urlpatterns = [
     # 展示多级目录
     re_path(r'^(?P<user_id>\d+)/wiki/catalog/$', wiki.wiki_catalog, name='wiki_catalog'),
 
+    # 删除文章
+    re_path(r'^(?P<user_id>\d+)/wiki/delete/(?P<wiki_id>\d+)/$', wiki.wiki_delete, name='wiki_delete'),
+
+    # 编辑文章
+    re_path(r'^(?P<user_id>\d+)/wiki/edit/(?P<wiki_id>\d+)/$', wiki.wiki_edit, name='wiki_edit'),
+
     # 星标项目
     re_path(r'^project/star/(?P<project_type>\w+)/(?P<project_id>\d+)/$', project.project_star, name='project_star'),
 

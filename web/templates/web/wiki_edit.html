@@ -14,8 +14,8 @@
 
             <div class="card-header">
                 <div class="head">
-                    <i class="fa-solid fa-square-plus"></i>
-                    新建文章
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    编辑文章
                 </div>
             </div>
 
@@ -28,7 +28,7 @@
 
                 <div class="col-sm-6 content">
 
-                    <form id="addPageForm" method="post">
+                    <form id="editPageForm" method="post">
                         {% csrf_token %}
                         {% for field in form %}
                             <div class="form-group mb-3">
@@ -60,7 +60,7 @@
 
         function initCatalog() {
             $.ajax({
-                url: "{% url 'web:wiki_catalog' user_id=request.tracer.id %}",
+                url: "{% url 'web:wiki_catalog' user_id=request.tracer.id%}",
                 type: "GET",
                 dataType: "JSON",
                 success: function (res) {
@@ -102,9 +102,9 @@
                 console.log('清空原信息')
 
                 $.ajax({
-                    url: "{% url 'web:wiki_add' user_id=request.tracer.id %}",
+                    url: "{% url 'web:wiki_edit' user_id=request.tracer.id wiki_id=wiki_object.id %}",
                     type: "POST",
-                    data: $('#addPageForm').serialize(),     // 收集表单数据,所有字段+csrf
+                    data: $('#editPageForm').serialize(),     // 收集表单数据,所有字段+csrf
                     dataType: "JSON",
                     success: function (res) {
                         if (res.status) {

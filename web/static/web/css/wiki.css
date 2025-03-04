@@ -68,3 +68,49 @@
     margin-top: 3px;
     position: absolute;
 }
+
+/* wiki.css */
+
+/* 保留多级列表默认样式和缩进 */
+#catalog,
+#catalog ul {
+  list-style-type: disc; /* 一级列表实心圆点 */
+  padding-left: 1.5em; /* 保持默认缩进 */
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+#catalog ul ul {
+  list-style-type: circle; /* 二级列表空心圆点 */
+}
+
+#catalog ul ul ul {
+  list-style-type: square; /* 三级列表方点 */
+}
+
+/* 目录链接基础样式 */
+#catalog a {
+  color: #575757;
+  text-decoration: none;
+  display: inline-block;
+  padding: 3px 2px;
+  transition: color 0.2s ease;
+}
+
+/* 激活状态样式 */
+#catalog a.active {
+  color: #000000;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* 悬停效果 */
+#catalog a:hover {
+  color: #333;
+}
+
+/* 点击瞬间效果 */
+#catalog a:active {
+  color: #000;
+  text-decoration: underline;
+}
