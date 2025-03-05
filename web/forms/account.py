@@ -11,69 +11,69 @@ class RegisterModelForm(BootstrapForm, forms.ModelForm):
     # 用户名验证
     user_name = forms.CharField(
         label='用户名',
-        min_length=6,
-        max_length=16,
-        validators=[
-            RegexValidator(
-                regex=r'^[a-zA-Z0-9_-]{6,16}$',  # 正则表达式
-                message='用户名只能包含字母、数字、下划线或短横线，长度为6-16位。'
-            )
-        ]
+        # min_length=6,
+        # max_length=16,
+        # validators=[
+        #     RegexValidator(
+        #         regex=r'^[a-zA-Z0-9_-]{6,16}$',  # 正则表达式
+        #         message='用户名只能包含字母、数字、下划线或短横线，长度为6-16位。'
+        #     )
+        # ]
     )
 
     # 邮箱验证
     user_email = forms.EmailField(
         label='邮箱',
-        validators=[
-            RegexValidator(
-                regex=r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',  # 正则表达式
-                message='邮箱格式错误。'
-            )
-        ]
+        # validators=[
+        #     RegexValidator(
+        #         regex=r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',  # 正则表达式
+        #         message='邮箱格式错误。'
+        #     )
+        # ]
     )
 
     # 手机号验证
     user_phone = forms.CharField(
         label='手机号',
-        validators=[
-            RegexValidator(
-                regex=r'^1[3456789]\d{9}$',  # 正则表达式
-                message='手机号格式错误。'
-            )
-        ]
+        # validators=[
+        #     RegexValidator(
+        #         regex=r'^1[3456789]\d{9}$',  # 正则表达式
+        #         message='手机号格式错误。'
+        #     )
+        # ]
     )
 
     # 密码隐藏
     user_pw = forms.CharField(
         label='密码',
-        min_length=8,
-        max_length=32,
-        widget=forms.PasswordInput,
-        validators=[
-            RegexValidator(
-                regex=r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,32}$',
-                message="密码必须包含字母、数字，并且长度在8到32个字符之间。"
-            )
-        ]
+        # min_length=8,
+        # max_length=32,
+        # widget=forms.PasswordInput,
+        # validators=[
+        #     RegexValidator(
+        #         regex=r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,32}$',
+        #         message="密码必须包含字母、数字，并且长度在8到32个字符之间。"
+        #     )
+        # ]
     )
 
     # 二次输入密码
     confirm_user_pw = forms.CharField(
         label='重复密码',
-        min_length=8,
-        max_length=32,
-        widget=forms.PasswordInput,
-        validators=[
-            RegexValidator(
-                regex=r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,32}$',
-                message="密码必须包含字母、数字，并且长度在8到32个字符之间。"
-            )
-        ]
+        # min_length=8,
+        # max_length=32,
+        # widget=forms.PasswordInput,
+        # validators=[
+        #     RegexValidator(
+        #         regex=r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,32}$',
+        #         message="密码必须包含字母、数字，并且长度在8到32个字符之间。"
+        #     )
+        # ]
     )
 
     class Meta:
         model = models.UserInfo
-        fields = '__all__'
+        fields = ['user_name', 'user_email', 'user_phone', 'user_pw']
 
     # 更改字段样式
     # def __init__(self, *args, **kwargs):
@@ -179,25 +179,25 @@ class RegisterModelForm(BootstrapForm, forms.ModelForm):
 class LoginPhoneModelForm(BootstrapForm, forms.Form):
     user_phone = forms.CharField(
         label='手机号',
-        validators=[
-            RegexValidator(
-                regex=r'^1[3456789]\d{9}$',  # 正则表达式
-                message='手机号格式错误。'
-            )
-        ]
+        # validators=[
+        #     RegexValidator(
+        #         regex=r'^1[3456789]\d{9}$',  # 正则表达式
+        #         message='手机号格式错误。'
+        #     )
+        # ]
     )
 
     user_pw = forms.CharField(
         label='密码',
-        min_length=8,
-        max_length=32,
-        widget=forms.PasswordInput(render_value=True),
-        validators=[
-            RegexValidator(
-                regex=r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,32}$',
-                message="密码必须包含字母、数字，并且长度在8到32个字符之间。"
-            )
-        ]
+        # min_length=8,
+        # max_length=32,
+        # widget=forms.PasswordInput(render_value=True),
+        # validators=[
+        #     RegexValidator(
+        #         regex=r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,32}$',
+        #         message="密码必须包含字母、数字，并且长度在8到32个字符之间。"
+        #     )
+        # ]
     )
 
     code = forms.CharField(label="图片验证码")
@@ -230,13 +230,14 @@ class LoginPhoneModelForm(BootstrapForm, forms.Form):
 
     def clean_code(self):
         code = self.cleaned_data['code']
+
         session_code = self.request.session.get('image_object')
 
-        if not session_code:
-            raise ValidationError("验证码已过期，请重新获取。")
-
-        if code.strip().upper() != session_code.strip().upper():
-            raise ValidationError("验证码错误，请重新输入。")
+        # if not session_code:
+        #     raise ValidationError("验证码已过期，请重新获取。")
+        #
+        # if code.strip().upper() != session_code.strip().upper():
+        #     raise ValidationError("验证码错误，请重新输入。")
 
         return code
 
@@ -244,27 +245,27 @@ class LoginPhoneModelForm(BootstrapForm, forms.Form):
 class LoginNameModelForm(BootstrapForm, forms.Form):
     user_name = forms.CharField(
         label='用户名',
-        min_length=6,
-        max_length=16,
-        validators=[
-            RegexValidator(
-                regex=r'^[a-zA-Z0-9_-]{6,16}$',  # 正则表达式
-                message='用户名只能包含字母、数字、下划线或短横线，长度为6-16位。'
-            )
-        ]
+        # min_length=6,
+        # max_length=16,
+        # validators=[
+        #     RegexValidator(
+        #         regex=r'^[a-zA-Z0-9_-]{6,16}$',  # 正则表达式
+        #         message='用户名只能包含字母、数字、下划线或短横线，长度为6-16位。'
+        #     )
+        # ]
     )
 
     user_pw = forms.CharField(
         label='密码',
-        min_length=8,
-        max_length=32,
-        widget=forms.PasswordInput(render_value=True),
-        validators=[
-            RegexValidator(
-                regex=r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,32}$',
-                message="密码必须包含字母、数字，并且长度在8到32个字符之间。"
-            )
-        ]
+        # min_length=8,
+        # max_length=32,
+        # widget=forms.PasswordInput(render_value=True),
+        # validators=[
+        #     RegexValidator(
+        #         regex=r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,32}$',
+        #         message="密码必须包含字母、数字，并且长度在8到32个字符之间。"
+        #     )
+        # ]
     )
 
     code = forms.CharField(label="图片验证码")
@@ -298,36 +299,36 @@ class LoginNameModelForm(BootstrapForm, forms.Form):
         code = self.cleaned_data['code']
         session_code = self.request.session.get('image_object')
 
-        if not session_code:
-            raise ValidationError("验证码已过期，请重新获取。")
-
-        if code.strip().upper() != session_code.strip().upper():
-            raise ValidationError("验证码错误，请重新输入。")
+        # if not session_code:
+        #     raise ValidationError("验证码已过期，请重新获取。")
+        #
+        # if code.strip().upper() != session_code.strip().upper():
+        #     raise ValidationError("验证码错误，请重新输入。")
 
         return code
 
 class LoginEmailModelForm(BootstrapForm, forms.Form):
     user_email = forms.EmailField(
         label='邮箱',
-        validators=[
-            RegexValidator(
-                regex=r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',  # 正则表达式
-                message='邮箱格式错误。'
-            )
-        ]
+        # validators=[
+        #     RegexValidator(
+        #         regex=r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',  # 正则表达式
+        #         message='邮箱格式错误。'
+        #     )
+        # ]
     )
 
     user_pw = forms.CharField(
         label='密码',
-        min_length=8,
-        max_length=32,
-        widget=forms.PasswordInput(render_value=True),
-        validators=[
-            RegexValidator(
-                regex=r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,32}$',
-                message="密码必须包含字母、数字，并且长度在8到32个字符之间。"
-            )
-        ]
+        # min_length=8,
+        # max_length=32,
+        # widget=forms.PasswordInput(render_value=True),
+        # validators=[
+        #     RegexValidator(
+        #         regex=r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,32}$',
+        #         message="密码必须包含字母、数字，并且长度在8到32个字符之间。"
+        #     )
+        # ]
     )
 
     code = forms.CharField(label="图片验证码")
@@ -361,11 +362,11 @@ class LoginEmailModelForm(BootstrapForm, forms.Form):
         code = self.cleaned_data['code']
         session_code = self.request.session.get('image_object')
 
-        if not session_code:
-            raise ValidationError("验证码已过期，请重新获取。")
-
-        if code.strip().upper() != session_code.strip().upper():
-            raise ValidationError("验证码错误，请重新输入。")
+        # if not session_code:
+        #     raise ValidationError("验证码已过期，请重新获取。")
+        #
+        # if code.strip().upper() != session_code.strip().upper():
+        #     raise ValidationError("验证码错误，请重新输入。")
 
         return code
 

@@ -12,6 +12,10 @@ class UserInfo(models.Model):
 
     user_pw = models.CharField(verbose_name='密码', max_length=32)
 
+    bucket = models.CharField(verbose_name='cos桶', max_length=128)
+
+    region = models.CharField(verbose_name='cos区域', max_length=32)
+
 
 class Project(models.Model):
     COLOR_CHOICES = (

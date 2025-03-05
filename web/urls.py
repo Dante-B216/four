@@ -53,6 +53,9 @@ urlpatterns = [
     # 编辑文章
     re_path(r'^(?P<user_id>\d+)/wiki/edit/(?P<wiki_id>\d+)/$', wiki.wiki_edit, name='wiki_edit'),
 
+    # 上传图片
+    re_path(r'^(?P<user_id>\d+)/wiki/upload/$', wiki.wiki_upload, name='wiki_upload'),
+
     # 星标项目
     re_path(r'^project/star/(?P<project_type>\w+)/(?P<project_id>\d+)/$', project.project_star, name='project_star'),
 

@@ -1,3 +1,5 @@
+import time
+
 from django.contrib.auth.hashers import check_password
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse
@@ -10,6 +12,8 @@ from web.forms.account import LoginPhoneModelForm
 from web.forms.account import LoginNameModelForm
 from web.forms.account import LoginEmailModelForm
 
+from utils.tencent.cos import create_bucket
+
 
 def register(request):
     if request.method == 'GET':
@@ -20,6 +24,15 @@ def register(request):
     if form.is_valid():
         print("form is_valid")
         print(form.cleaned_data)
+        # 为用户创建一个桶
+        bucket = "{}-{}-1339285139".format(form.instance.user_phone, str(int(time.time())))
+        region = "ap-guangzhou"
+        create_bucket(bucket, region)
+
+        # 把桶和区域写入数据库
+        form.instance.bucket = bucket
+        form.instance.region = region
+
         # 验证通过，写入数据库（密码加密）
         instance = form.save()
         return JsonResponse({'status': True, 'data': '/web/login/user_name/'})
@@ -40,7 +53,6 @@ def register(request):
 
 # 手机号登录
 def login_phone(request):
-
     if request.method == 'GET':
         form = LoginPhoneModelForm(request)
         return render(request, 'web/login_phone.html', {'form': form})
@@ -67,14 +79,14 @@ def login_phone(request):
             # 存储用户ID到session
             request.session['user_id'] = user.id
 
-            return JsonResponse({'status': True, 'data': '/web/index'})     # 跳转首页
+            return JsonResponse({'status': True, 'data': '/web/index'})  # 跳转首页
         else:
-            return JsonResponse({'status': False, 'error': {'user_pw': ['密码错误。']}})     # 在user_pw下面报错：密码错误。
+            return JsonResponse({'status': False, 'error': {'user_pw': ['密码错误。']}})  # 在user_pw下面报错：密码错误。
     # 表单验证不通过
     else:
         print("form not_valid")
         print(form.errors)
-        return JsonResponse({'status': False, 'error': form.errors})    # 把错误显示在表单上
+        return JsonResponse({'status': False, 'error': form.errors})  # 把错误显示在表单上
 
 
 # 生成图片验证码
@@ -87,6 +99,7 @@ def img_code(request):
 
     # 把验证码写入到session
     request.session['image_object'] = code
+
     # 60s后失效
     request.session.set_expiry(60)
 
@@ -97,8 +110,8 @@ def img_code(request):
     # 将内存中的图片返回给网页
     return HttpResponse(stream.getvalue())
 
-def login_name(request):
 
+def login_name(request):
     if request.method == 'GET':
         form = LoginNameModelForm(request)
         return render(request, 'web/login_name.html', {'form': form})
@@ -125,14 +138,14 @@ def login_name(request):
             # 存储用户ID到session
             request.session['user_id'] = user.id
 
-            return JsonResponse({'status': True, 'data': '/web/index'})     # 跳转首页
+            return JsonResponse({'status': True, 'data': '/web/index'})  # 跳转首页
         else:
-            return JsonResponse({'status': False, 'error': {'user_pw': ['密码错误。']}})     # 在user_pw下面报错：密码错误。
+            return JsonResponse({'status': False, 'error': {'user_pw': ['密码错误。']}})  # 在user_pw下面报错：密码错误。
     # 表单验证不通过
     else:
         print("form not_valid")
         print(form.errors)
-        return JsonResponse({'status': False, 'error': form.errors})    # 把错误显示在表单上
+        return JsonResponse({'status': False, 'error': form.errors})  # 把错误显示在表单上
 
 
 def login_email(request):
@@ -171,13 +184,16 @@ def login_email(request):
         print(form.errors)
         return JsonResponse({'status': False, 'error': form.errors})  # 把错误显示在表单上
 
+
 # 退出
 def logout(request):
     request.session.flush()
     return redirect('/web/index')
 
+
 def index(request):
     return render(request, 'web/index.html')
+
 
 def help(request):
     return render(request, 'web/help.html')

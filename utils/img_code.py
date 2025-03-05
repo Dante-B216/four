@@ -51,5 +51,6 @@ def check_code(width=120, height=30, char_length=5, font_file='Monaco.ttf', font
         draw.line((x1, y1, x2, y2), fill=rndColor())
 
     img = img.filter(ImageFilter.EDGE_ENHANCE_MORE)
+
     return img, ''.join(code)
 

@@ -5,6 +5,7 @@
 
 {% block css %}
     <link rel="stylesheet" href="{% static 'web/css/wiki.css' %}">
+    <link rel="stylesheet" href="{% static 'web/plugin/editor-md/css/editormd.min.css' %}">
 {% endblock %}
 
 
@@ -31,11 +32,21 @@
                     <form id="editPageForm" method="post">
                         {% csrf_token %}
                         {% for field in form %}
-                            <div class="form-group mb-3">
-                                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                                {{ field }}
-                                <span class="error-msg"></span>
-                            </div>
+                            {% if field.name == "page_content" %}
+                                <div class="form-group mb-3">
+                                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                    <div id="editor">
+                                        {{ field }}
+                                    </div>
+                                    <span class="error-msg"></span>
+                                </div>
+                            {% else %}
+                                <div class="form-group mb-3">
+                                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                    {{ field }}
+                                    <span class="error-msg"></span>
+                                </div>
+                            {% endif %}
                         {% endfor %}
                         <div class="text-center">
                             <button id="submitBtn" type="button" class="btn btn-primary">提交</button>
@@ -50,13 +61,31 @@
 {% endblock %}
 
 {% block js %}
+    <script src="{% static "web/plugin/editor-md/editormd.min.js" %}"></script>
+
     <script>
         var WIKI_DETAIL_URL = "{% url 'web:wiki' user_id=request.tracer.id %}";     //全局变量
+        var WIKI_UPLOAD_URL = "{% url 'web:wiki_upload' user_id=request.tracer.id %}"
 
         $(function () {
             initCatalog();      //初始化多级目录
             bindClickSubmitBtn();
+            initEditorMd();
         });
+
+        /*
+        初始化markdown编辑器：textare转换为编辑器
+         */
+        function initEditorMd() {
+            editormd('editor',{
+                placeholder:"请输入内容",
+                height:500,
+                path:"{% static "web/plugin/editor-md/lib/" %}",
+                imageUpload:true,
+                imageFormats:["jpg","jpeg","png","gif"],
+                imageUploadURL:WIKI_UPLOAD_URL
+            })
+        }
 
         function initCatalog() {
             $.ajax({

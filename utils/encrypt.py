@@ -1,5 +1,6 @@
 import hashlib
 from django.conf import settings
+import uuid
 
 # 加密输入的密码
 def md5(string):
@@ -10,3 +11,9 @@ def md5(string):
     hash_object.update(string.encode('utf-8'))
 
     return hash_object.hexdigest()
+
+def uid(string):
+
+    data = "{}-{}".format(str(uuid.uuid4()), string)
+
+    return md5(data)
