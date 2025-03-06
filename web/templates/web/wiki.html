@@ -5,7 +5,7 @@
 
 {% block css %}
     <link rel="stylesheet" href="{% static 'web/css/wiki.css' %}">
-    <link rel="stylesheet" href="{% static 'web/plugin/editor-md/css/editormd.preview.min.css' %}">
+    <link rel="stylesheet" href="{% static 'web/plugin/editor-md/css/editormd.preview.css' %}">
 {% endblock %}
 
 
@@ -29,14 +29,59 @@
                             <i class="fa-solid fa-pen-to-square"></i>
                             编辑
                         </a>
+
                         <a type="button" class="btn btn-danger btn-sm"
-                           data-bs-toggle="modal" data-bs-target="#deleteModal"
                            href="/web/{{ request.tracer.id }}/wiki/delete/{{ wiki_object.id }}">
                             <i class="fa-solid fa-trash-can"></i>
                             删除
                         </a>
 
+                        <!--
+                        <a type="button" class="btn btn-danger btn-sm"
+                           data-bs-toggle="modal" data-bs-target="#deleteModal" >
+                            <i class="fa-solid fa-trash-can"></i>
+                            删除
+                        </a>
+                        -->
+
+
+                        <!--
+                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                data-bs-target="#deleteModal">
+                            <i class="fa-solid fa-trash-can"></i>
+                            删除
+                        </button>
+                        -->
+
+                        <!-- Modal -->
+                        <!--
+                        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel"
+                             aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h1 class="modal-title fs-5" id="deleteModalLabel"
+                                            style="font-size: 16px;font-weight: bolder ">确认删除</h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        确定删除？删除后无法恢复！
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                                                style="font-size: 14px">取消
+                                        </button>
+                                        <button type="button" class="btn btn-danger" style="font-size: 14px">确定
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        -->
+
                         <!-- 删除确认模态框 -->
+                        <!--
                         <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel"
                              aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered">
@@ -61,6 +106,7 @@
                                 </div>
                             </div>
                         </div>
+                        -->
 
                     {% endif %}
                 </div>
@@ -97,9 +143,7 @@
 {% endblock %}
 
 {% block js %}
-    <script src="{% static 'web/js/jquery.js' %}"></script>
 
-    <script src="{% static "web/plugin/editor-md/editormd.min.js" %}"></script>
     <script src="{% static "web/plugin/editor-md/lib/flowchart.min.js" %}"></script>
     <script src="{% static "web/plugin/editor-md/lib/jquery.flowchart.min.js" %}"></script>
     <script src="{% static "web/plugin/editor-md/lib/marked.min.js" %}"></script>
@@ -108,9 +152,14 @@
     <script src="{% static "web/plugin/editor-md/lib/sequence-diagram.min.js" %}"></script>
     <script src="{% static "web/plugin/editor-md/lib/underscore.min.js" %}"></script>
 
+    <script src="{% static "web/plugin/editor-md/editormd.js" %}"></script>
+
     <script>
 
         var WIKI_DETAIL_URL = "{% url 'web:wiki' user_id=request.tracer.id %}";     //全局变量
+
+        const tracerId = '{{ request.tracer.id }}';
+        const wikiId = '{{ wiki_object.id }}';
 
         $(function () {
             initCatalog();      //初始化多级目录
@@ -157,15 +206,6 @@
                 }
             })
         }
-
-        const tracerId = '{{ request.tracer.id }}';
-        const wikiId = '{{ wiki_object.id }}';
-
-        // 监听确认删除按钮的点击事件
-        document.getElementById('confirmDeleteButton').addEventListener('click', () => {
-            // 跳转到删除 URL
-            window.location.href = `/web/${tracerId}/wiki/delete/${wikiId}/`;
-        });
 
     </script>
 

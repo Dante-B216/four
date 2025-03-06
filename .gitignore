@@ -6,6 +6,8 @@ __pycache__/
 *$py.class
 
 local_settings.py
+settings.py
+
 
 # database migrations
 */migrations/*.py

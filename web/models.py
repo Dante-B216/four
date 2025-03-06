@@ -42,6 +42,7 @@ class Project(models.Model):
 
 
 class OriginalImage(models.Model):
+
     original_img = models.ImageField(verbose_name='本地上传图像')
 
     original_img_time = models.DateTimeField(verbose_name='上传时间', auto_now_add=True)

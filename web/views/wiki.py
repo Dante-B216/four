@@ -22,7 +22,7 @@ def wiki(request, user_id):
     wiki_object = models.Wiki.objects.filter(id=wiki_id, user_id=request.tracer).first()
 
     print("wiki_object:", wiki_object)
-    print("wiki_object.page_content", wiki_object.page_content)
+    print("wiki_object.page_content:", wiki_object.page_content)
 
     return render(request, "web/wiki.html", {"wiki_object": wiki_object})
 

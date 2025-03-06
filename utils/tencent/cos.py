@@ -27,6 +27,26 @@ def create_bucket(bucket, region="ap-guangzhou"):
         ACL='public-read',
     )
 
+    # 配置CORS规则
+    cors_config = {
+        'CORSRule': [
+            {
+                "AllowedOrigin": "*",
+                "AllowedMethod": ["GET", "POST", "PUT", "DELETE", "HEAD"],
+                "AllowedHeader": "*",
+                "ExposeHeader": "*",
+                "MaxAgeSeconds": 500
+            }
+        ]
+
+    }
+
+    # 设置CORS配置
+    client.put_bucket_cors(
+        Bucket=bucket,
+        CORSConfiguration=cors_config
+    )
+
 
 def upload_file(bucket, region, file_object, key):
     # 把图片对象上传到当前用户的桶
