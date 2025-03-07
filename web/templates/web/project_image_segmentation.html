@@ -4,14 +4,176 @@
 {% block title %}图像分割中心{% endblock %}
 
 {% block css %}
-
+    <link rel="stylesheet" href="{% static 'web/css/project_image_segmentation.css' %}">
 {% endblock %}
 
 {% block content %}
+    <div class="container-fluid vh-100">
+        <!-- 标题区 -->
+        <div class="row py-4 bg-light border-bottom">
+            <div class="col-12 text-center">
+                <h1 class="display-4">医学图像分割系统</h1>
+                <p class="lead text-muted">基于深度学习的医学影像自动分割解决方案</p>
+            </div>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="row g-4 p-4">
+            <!-- 上传列 -->
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">图像上传</h5>
+
+                        <div class="upload-area d-flex flex-column align-items-center justify-content-center"
+                             onclick="document.getElementById('upload-input').click()">
+
+                            <input type="file" id="upload-input" accept="image/*" class="d-none">
+
+                            <div id="upload-label" class="text-center">
+                                <i class="bi bi-cloud-upload fs-1 text-primary"></i>
+                                <p class="text-muted mt-2">点击上传图像
+                                    <small>支持JPG/PNG格式</small></p>
+                            </div>
+
+                            <img id="preview-image" class="img-fluid d-none" alt="预览图像">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 控制列 -->
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">处理设置</h5>
+
+                        <div class="mb-4">
+                            <label class="form-label">选择模型</label>
+                            <select class="form-select">
+                                <option value="unet">U-Net 模型</option>
+                                <option value="deeplab">DeepLab V3+</option>
+                                <option value="maskrcnn">Mask R-CNN</option>
+                            </select>
+                        </div>
+
+                        <button class="btn btn-success w-100 py-2">
+                            <i class="bi bi-gear"></i> 开始分割
+                        </button>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- 结果列 -->
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">处理结果</h5>
+
+                        <div class="upload-area d-flex align-items-center justify-content-center">
+                            <div id="result-placeholder" class="text-center">
+                                <i class="bi bi-image fs-1 text-muted"></i>
+                                <p class="text-muted mt-2">分割结果预览</p>
+                            </div>
+                            <img id="result-image" class="img-fluid d-none" alt="结果图像">
+                        </div>
+
+                        <button class="btn btn-primary w-100 mt-4 py-2" disabled id="download-btn">
+                            <i class="bi bi-download"></i> 下载结果
+                        </button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}
 
 {% block js %}
+
+    <script>
+
+        // 图片预览功能
+        // 获取ID为'upload-input'的文件上传输入元素，并为其添加'change'事件监听器
+        // 当用户选择文件后触发该事件
+        document.getElementById('upload-input').addEventListener('change', function (e) {
+            // 从事件对象中获取用户选择的第一个文件（因为文件输入可能支持多选，此处取第一个）
+            const file = e.target.files[0];
+
+            // 获取用于预览图片的<img>元素
+            const preview = document.getElementById('preview-image');
+
+            // 获取上传文件的标签/按钮元素（通常包含上传图标和文字提示）
+            const label = document.getElementById('upload-label');
+
+            // 检查用户是否确实选择了文件（避免空值情况）
+            if (file) {
+                // 创建FileReader对象，用于读取文件内容
+                const reader = new FileReader();
+
+                // 定义文件读取完成时的回调函数
+                reader.onload = function (e) {
+                    // 将读取结果（Data URL格式）赋值给预览图片的src属性
+                    preview.src = e.target.result;
+
+                    // 移除预览图片元素的'd-none'类
+                    preview.classList.remove('d-none');
+
+                    // 给上传标签添加'd-none'类，隐藏上传按钮/提示文字
+                    label.classList.add('d-none');
+                }
+
+                // 启动文件读取操作，将文件内容读取为Data URL（Base64编码格式）
+                // 读取完成后会自动触发上述定义的onload回调
+                reader.readAsDataURL(file);
+            }
+
+            // 获取COS临时凭证
+            // 上传文件
+
+        });
+
+        // 模拟处理功能
+        // 获取类名为'btn-success'的第一个按钮元素，并添加点击事件监听器
+        document.querySelector('.btn-success').addEventListener('click', function () {
+            // 获取下载按钮元素和结果显示图片元素
+            const downloadBtn = document.getElementById('download-btn');
+            const resultImage = document.getElementById('result-image');
+
+            // 模拟处理延迟的交互逻辑
+            // 禁用当前按钮防止重复点击
+            this.disabled = true;
+
+            // 更新按钮文字为加载状态，包含旋转加载图标（假设使用Bootstrap图标）
+            this.innerHTML = '<div class="spinner-border spinner-border-sm"></div> 处理中...';
+
+            // 使用setTimeout模拟异步处理过程（实际开发中应替换为真实API调用）
+            setTimeout(() => {
+                // 恢复按钮可点击状态
+                this.disabled = false;
+
+                // 重置按钮原始图标和文字（假设使用Bootstrap齿轮图标）
+                this.innerHTML = '<i class="bi bi-gear"></i> 开始分割';
+
+                // 启用下载按钮
+                downloadBtn.disabled = false;
+
+                // 将预览图片的src赋值给结果图片（此处为模拟，实际需替换处理后的图片）
+                resultImage.src = document.getElementById('preview-image').src;
+
+                // 显示结果图片元素
+                resultImage.classList.remove('d-none');
+
+                // 隐藏结果占位符元素（如加载提示或空白区域）
+                document.getElementById('result-placeholder').classList.add('d-none');
+
+            }, 2000); // 模拟2秒处理时长
+        });
+
+    </script>
 
 {% endblock %}
 
