@@ -89,7 +89,28 @@
                 </div>
             </div>
         </div>
+
+
+        <!-- 进度条 -->
+        <div id="uploadProgress" class="upload-progress d-none">
+            <div class="card-header">
+                <i class="fa-solid fa-arrow-up-from-bracket"></i> 上传进度
+            </div>
+
+            <div class="card-body">
+                <div class="name"></div>
+                <div class="progress" role="progressbar" aria-label="Animated striped example" aria-valuenow="75"
+                     aria-valuemin="0" aria-valuemax="100">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%">
+                        0%
+                    </div>
+                </div>
+                <div class="progress-error"></div>
+            </div>
+        </div>
+
     </div>
+
 
 {% endblock %}
 
@@ -104,61 +125,89 @@
             // 从事件对象中获取用户选择的第一个文件（因为文件输入可能支持多选，此处取第一个）
             const file = e.target.files[0];
 
-            // 获取COS临时凭证
-            var cos_object = new COS({
-                // options:获取临时密钥需要的参数对象
-                // callback:临时密钥获取完成后的回传方法
-                getAuthorization: function (options, callback) {
-                    // 向django后台发送请求，获取临时凭证
-                    // $.ajax({type:"GET"})
-                    $.get("/web/project/cos/credential/", {
+            // 获取用于预览图片的<img>元素
+            const preview = document.getElementById('preview-image');
 
-                        // data是'/web/cos/credential'返回的值
-                    }, function (data) {
-                        var credentials = data && data.credentials;
-                        if (!data || !credentials) return console.error("credentials invalid");
-                        callback({
-                            TmpSecretId: credentials.tmpSecretId,
-                            TmpSecretKey: credentials.tmpSecretKey,
-                            SecurityToken: credentials.sessionToken,
-                            StartTime: data.startTime,
-                            ExpiredTime: data.expiredTime,
+            // 获取文件文字提示元素
+            const label = document.getElementById('upload-label');
+
+            // 获取上传区域DOM元素
+            const uploadArea = document.querySelector('.upload-area');
+
+            // 获取进度条元素
+            const uploadProgress = document.getElementById("uploadProgress");
+
+            // 检查用户是否确实选择了文件（避免空值情况）
+            if (file) {
+                // 禁用上传区域
+                uploadArea.classList.add('upload-disabled');  // 添加禁用样式
+                uploadArea.onclick = null;                    // 移除点击事件
+
+
+                // 获取COS临时凭证
+                var cos_object = new COS({
+                    // options:获取临时密钥需要的参数对象
+                    // callback:临时密钥获取完成后的回传方法
+                    getAuthorization: function (options, callback) {
+                        // 向django后台发送请求，获取临时凭证
+                        // $.ajax({type:"GET"})
+                        $.get("/web/project/cos/credential/", {
+
+                            // data是'/web/cos/credential'返回的值
+                        }, function (data) {
+                            var credentials = data && data.credentials;
+                            if (!data || !credentials) return console.error("credentials invalid");
+                            callback({
+                                TmpSecretId: credentials.tmpSecretId,
+                                TmpSecretKey: credentials.tmpSecretKey,
+                                SecurityToken: credentials.sessionToken,
+                                StartTime: data.startTime,
+                                ExpiredTime: data.expiredTime,
+                            });
                         });
-                    });
-                }
-            });
+                    }
+                });
 
-            // 上传文件【异步】
-            var fileName = file.name;
-            cos_object.uploadFile({
-                Bucket: "{{ request.tracer.bucket }}",
-                Region: "{{ request.tracer.region }}",
-                Key: fileName,
-                Body: file,
-                onProgress: function (progressData) {
-                    console.log("文件上传进度---->", fileName, JSON.stringify(progressData));
-                }
-            }, function (err, data) {
-                console.log(err || data);
+                var fileName = file.name;
 
-                const fileUrl = `https://${data.Location}`;     // 上传到COS的图片地址
+                $("#uploadProgress").find(".name").text(fileName);
 
-                // ---------------------------------显示上传的图片---------------------------------
-                // 获取用于预览图片的<img>元素
-                const preview = document.getElementById('preview-image');
+                // 上传文件【异步】
+                cos_object.uploadFile({
+                    Bucket: "{{ request.tracer.bucket }}",
+                    Region: "{{ request.tracer.region }}",
+                    Key: fileName,
+                    Body: file,
+                    onProgress: function (progressData) {
+                        console.log("文件上传进度---->", fileName, JSON.stringify(progressData));
+                        // 进度条显示
+                        uploadProgress.classList.remove("d-none");      // 显示进度条
+                        var percent = progressData.percent * 100 + "%";
+                        $("#uploadProgress").find(".progress-bar").text(percent);
+                        $("#uploadProgress").find(".progress-bar").css("width", percent);
+                    }
+                }, function (err, data) {
+                    console.log(err || data);
 
-                // 获取文件文字提示元素
-                const label = document.getElementById('upload-label');
+                    // 上传失败
+                    if (err) {
+                        $("#uploadProgress").find(".progress-error").text("上传失败。")
 
-                // 检查用户是否确实选择了文件（避免空值情况）
-                if (file) {
-                    // 创建FileReader对象，用于读取文件内容
-                    const reader = new FileReader();
+                        uploadArea.classList.remove('upload-disabled');
 
-                    // 定义文件读取完成时的回调函数
-                    reader.onload = function (e) {
-                        // 将读取结果（Data URL格式）赋值给预览图片的src属性
-                        // preview.src = e.target.result;
+                        // 恢复点击事件
+                        uploadArea.onclick = () => document.getElementById('upload-input').click();
+
+                        // 3秒后隐藏进度条
+                        setTimeout(() => uploadProgress.classList.add("d-none"), 3000);
+                    } else {    // 上传成功
+
+                        // 3秒后隐藏进度条
+                        setTimeout(() => uploadProgress.classList.add("d-none"), 3000);
+
+                        const fileUrl = `https://${data.Location}`;     // 上传到COS的图片地址
+
+                        // 将COS的图片地址赋值给预览图片的src属性
                         preview.src = fileUrl
 
                         // 移除预览图片元素的'd-none'类
@@ -166,48 +215,17 @@
 
                         // 给文件文字提示元素添加'd-none'类，隐藏提示文字
                         label.classList.add('d-none');
+
+
+                        // 把url保存到数据库
+
+
                     }
 
-                    // 启动文件读取操作，将文件内容读取为Data URL（Base64编码格式）
-                    // 读取完成后会自动触发上述定义的onload回调
-                    reader.readAsDataURL(file);
-                }
-                // ---------------------------------显示上传的图片---------------------------------
-            });
-
-            {% comment %}
-            // --------------------------------------------显示上传的图片--------------------------------------------
-            // 获取用于预览图片的<img>元素
-            const preview = document.getElementById('preview-image');
-
-            // 获取文件文字提示元素
-            const label = document.getElementById('upload-label');
-
-            // 检查用户是否确实选择了文件（避免空值情况）
-            if (file) {
-                // 创建FileReader对象，用于读取文件内容
-                const reader = new FileReader();
-
-                // 定义文件读取完成时的回调函数
-                reader.onload = function (e) {
-                    // 将读取结果（Data URL格式）赋值给预览图片的src属性
-                    preview.src = e.target.result;
-
-                    // 移除预览图片元素的'd-none'类
-                    preview.classList.remove('d-none');
-
-                    // 给文件文字提示元素添加'd-none'类，隐藏提示文字
-                    label.classList.add('d-none');
-                }
-
-                // 启动文件读取操作，将文件内容读取为Data URL（Base64编码格式）
-                // 读取完成后会自动触发上述定义的onload回调
-                reader.readAsDataURL(file);
+                })
             }
-            // --------------------------------------------显示上传的图片--------------------------------------------
-            {% endcomment %}
-
         });
+
 
         // 模拟处理功能
         // 获取类名为'btn-success'的第一个按钮元素，并添加点击事件监听器

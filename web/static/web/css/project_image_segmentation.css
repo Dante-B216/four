@@ -19,3 +19,63 @@
     height: calc(100vh - 180px);
     overflow-y: auto;
 }
+
+
+/* 进度条容器定位 */
+.upload-progress {
+    position: fixed;
+    right: 40px;
+    top: 55px;
+    width: 400px !important; /* 固定宽度 */
+    z-index: 9999; /* 确保在最顶层 */
+    margin: 0; /* 移除card默认边距 */
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important; /* 添加阴影 */
+}
+
+/* 卡片头部样式 */
+.upload-progress .card-header {
+    background-color: #f8f9fa;
+    padding: 0.75rem 1.25rem;
+    border-bottom: 1px solid #dee2e6;
+    font-weight: 500;
+}
+
+/* 进度条主体样式 */
+.upload-progress .card-body {
+    padding: 1rem;
+    background: #fff;
+}
+
+/* 进度条高度调整 */
+.upload-progress .progress {
+    height: 1.5rem; /* 调高进度条高度 */
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.upload-progress .progress-bar {
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    padding-left: 0.75rem;
+    transition: width 0.3s ease;
+}
+
+/* 响应式处理 */
+@media (max-width: 576px) {
+    #uploadProgress.upload-progress {
+        width: calc(100% - 40px); /* 移动端宽度 */
+        right: 20px;
+        left: 20px;
+        bottom: 20px;
+    }
+}
+
+.upload-progress .progress-error{
+    color: darkred;
+    margin-top: 16px;
+}
+
+.upload-progress .card-body .name{
+    margin-bottom: 16px;
+}

@@ -42,8 +42,7 @@ class Project(models.Model):
 
 
 class OriginalImage(models.Model):
-
-    original_img = models.ImageField(verbose_name='本地上传图像')
+    original_img = models.CharField(verbose_name='本地上传图像', max_length=255)
 
     original_img_time = models.DateTimeField(verbose_name='上传时间', auto_now_add=True)
 
@@ -62,7 +61,7 @@ class SegmentationResult(models.Model):
 
     model_type = models.SmallIntegerField(verbose_name='分割模型', choices=MODEL_CHOICES)
 
-    result_img = models.ImageField(verbose_name='分割结果图像')
+    result_img = models.CharField(verbose_name='分割结果图像', max_length=255)
 
     result_img_time = models.DateTimeField(verbose_name='分割完成时间', auto_now_add=True)
 
