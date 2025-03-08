@@ -60,12 +60,17 @@ urlpatterns = [
     re_path(r'^project/star/(?P<project_type>\w+)/(?P<project_id>\d+)/$', project.project_star, name='project_star'),
 
     # 取消星标
-    re_path(r'^project/delete_star/(?P<project_type>\w+)/(?P<project_id>\d+)/$', project.project_delete_star, name='project_delete_star'),
+    re_path(r'^project/delete_star/(?P<project_type>\w+)/(?P<project_id>\d+)/$', project.project_delete_star,
+            name='project_delete_star'),
 
     # 图像分割
-    re_path(r'^project/image_segmentation/(?P<project_id>\d+)/$', project.project_image_segmentation, name='project_image_segmentation'),
+    re_path(r'^project/image_segmentation/(?P<project_id>\d+)/$', project.project_image_segmentation,
+            name='project_image_segmentation'),
 
     # 项目管理
     re_path(r'^project/manage/(?P<project_id>\d+)/$', project.project_manage, name='project_manage'),
+
+    # 获取临时凭证
+    path('project/cos/credential/', project.cos_credential, name='cos_credential'),
 
 ]

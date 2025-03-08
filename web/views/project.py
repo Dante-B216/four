@@ -4,6 +4,13 @@ from web.forms.project import ProjectModelForm
 
 from web import models
 
+import json
+import os
+
+from sts.sts import Sts, CIScope, Scope
+
+from utils.tencent.cos import get_credential
+
 
 def project_add(request):
     if request.method == 'GET':
@@ -62,3 +69,8 @@ def project_image_segmentation(request, project_id):
 def project_manage(request, project_id):
     return render(request, "web/project_manage.html")
 
+
+def cos_credential(request):
+    data_dict = get_credential(request.tracer.bucket, request.tracer.region)
+    print("data_dict", data_dict)
+    return JsonResponse(data_dict)
