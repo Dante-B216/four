@@ -140,9 +140,42 @@
                 }
             }, function (err, data) {
                 console.log(err || data);
+
+                const fileUrl = `https://${data.Location}`;     // 上传到COS的图片地址
+
+                // ---------------------------------显示上传的图片---------------------------------
+                // 获取用于预览图片的<img>元素
+                const preview = document.getElementById('preview-image');
+
+                // 获取文件文字提示元素
+                const label = document.getElementById('upload-label');
+
+                // 检查用户是否确实选择了文件（避免空值情况）
+                if (file) {
+                    // 创建FileReader对象，用于读取文件内容
+                    const reader = new FileReader();
+
+                    // 定义文件读取完成时的回调函数
+                    reader.onload = function (e) {
+                        // 将读取结果（Data URL格式）赋值给预览图片的src属性
+                        // preview.src = e.target.result;
+                        preview.src = fileUrl
+
+                        // 移除预览图片元素的'd-none'类
+                        preview.classList.remove('d-none');
+
+                        // 给文件文字提示元素添加'd-none'类，隐藏提示文字
+                        label.classList.add('d-none');
+                    }
+
+                    // 启动文件读取操作，将文件内容读取为Data URL（Base64编码格式）
+                    // 读取完成后会自动触发上述定义的onload回调
+                    reader.readAsDataURL(file);
+                }
+                // ---------------------------------显示上传的图片---------------------------------
             });
 
-
+            {% comment %}
             // --------------------------------------------显示上传的图片--------------------------------------------
             // 获取用于预览图片的<img>元素
             const preview = document.getElementById('preview-image');
@@ -172,6 +205,7 @@
                 reader.readAsDataURL(file);
             }
             // --------------------------------------------显示上传的图片--------------------------------------------
+            {% endcomment %}
 
         });
 
