@@ -67,6 +67,10 @@ urlpatterns = [
     re_path(r'^project/image_segmentation/(?P<project_id>\d+)/$', project.project_image_segmentation,
             name='project_image_segmentation'),
 
+    # 进行图像分割
+    re_path(r'^project/image_segmentation/(?P<project_id>\d+)/handle/$', project.project_handle,
+            name='project_handle'),
+
     # 项目管理
     re_path(r'^project/manage/(?P<project_id>\d+)/$', project.project_manage, name='project_manage'),
 

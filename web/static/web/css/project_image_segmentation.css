@@ -15,6 +15,11 @@
     object-fit: contain;
 }
 
+#result-image {
+    max-height: 250px;
+    object-fit: contain;
+}
+
 .card {
     height: calc(100vh - 180px);
     overflow-y: auto;

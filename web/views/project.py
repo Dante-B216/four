@@ -66,7 +66,10 @@ def project_delete_star(request, project_type, project_id):
 
 
 def project_image_segmentation(request, project_id):
-    return render(request, "web/project_image_segmentation.html", {"project_id": project_id})
+    context = {
+        "project_id": project_id,
+    }
+    return render(request, "web/project_image_segmentation.html", context)
 
 
 def project_manage(request, project_id):
@@ -83,7 +86,6 @@ def cos_credential(request):
 # 将成功上传到COS的文件写入数据库
 @csrf_exempt
 def project_file_post(request, project_id):
-
     name = request.POST.get('name')
     path = request.POST.get('path')
 
@@ -98,3 +100,9 @@ def project_file_post(request, project_id):
     }
 
     return JsonResponse({'status': True, 'data': result})
+
+
+def project_handle(request, project_id):
+    model_type = request.POST.get("model")
+    print("model_type:", model_type)
+    return JsonResponse({'status': True})

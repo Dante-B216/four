@@ -9,6 +9,7 @@
 
 {% block content %}
     <div class="container-fluid vh-100">
+
         <!-- 标题区 -->
         <div class="row py-4 bg-light border-bottom">
             <div class="col-12 text-center">
@@ -32,7 +33,6 @@
                             <input type="file" id="upload-input" accept="image/*" class="d-none">
 
                             <div id="upload-label" class="text-center">
-                                <i class="bi bi-cloud-upload fs-1 text-primary"></i>
                                 <p class="text-muted mt-2">点击上传图像
                                     <small>支持JPG/PNG格式</small></p>
                             </div>
@@ -52,22 +52,45 @@
 
                         <div class="mb-4">
                             <label class="form-label">选择模型</label>
-                            <select class="form-select">
-                                <option value="unet">U-Net 模型</option>
-                                <option value="deeplab">DeepLab V3+</option>
-                                <option value="maskrcnn">Mask R-CNN</option>
+                            <select id="model-select" class="form-select">
+                                <option value="1">unet</option>
+                                <option value="2">unet_c</option>
+                                <option value="3">unet_s</option>
+                                <option value="4">unet_cs</option>
+                                <option value="5">unet++</option>
+                                <option value="6">u2net</option>
                             </select>
                         </div>
 
-                        <button class="btn btn-success w-100 py-2">
-                            <i class="bi bi-gear"></i> 开始分割
+                        <button id="handleBtn" type="submit" class="btn btn-success w-100 py-2" disabled>
+                            开始分割
                         </button>
-
                     </div>
                 </div>
             </div>
 
             <!-- 结果列 -->
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">处理结果</h5>
+
+                        <div class="upload-area d-flex flex-column align-items-center justify-content-center">
+
+                            <div id="result-placeholder" class="text-center">
+                                <p class="text-muted mt-2">分割结果预览</p>
+                            </div>
+
+                            <img id="result-image" class="img-fluid d-none" alt="结果图像">
+
+                        </div>
+                        <button class="btn btn-primary w-100 mt-4 py-2" disabled id="download-btn">
+                            <i class="bi bi-download"></i> 下载结果
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!--
             <div class="col-md-4">
                 <div class="card shadow-sm h-100">
                     <div class="card-body">
@@ -89,24 +112,27 @@
                 </div>
             </div>
         </div>
+        -->
 
 
-        <!-- 进度条 -->
-        <div id="uploadProgress" class="upload-progress d-none">
-            <div class="card-header">
-                <i class="fa-solid fa-arrow-up-from-bracket"></i> 上传进度
-            </div>
-
-            <div class="card-body">
-                <div class="name"></div>
-                <div class="progress" role="progressbar" aria-label="Animated striped example" aria-valuenow="75"
-                     aria-valuemin="0" aria-valuemax="100">
-                    <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%">
-                        0%
-                    </div>
+            <!-- 进度条 -->
+            <div id="uploadProgress" class="upload-progress d-none">
+                <div class="card-header">
+                    <i class="fa-solid fa-arrow-up-from-bracket"></i> 上传进度
                 </div>
-                <div class="progress-error"></div>
+
+                <div class="card-body">
+                    <div class="name"></div>
+                    <div class="progress" role="progressbar" aria-label="Animated striped example" aria-valuenow="75"
+                         aria-valuemin="0" aria-valuemax="100">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%">
+                            0%
+                        </div>
+                    </div>
+                    <div class="progress-error"></div>
+                </div>
             </div>
+
         </div>
 
     </div>
@@ -136,6 +162,9 @@
         // 获取进度条元素
         const uploadProgress = document.getElementById("uploadProgress");
 
+        // 获取开始分割按钮
+        const handleBtn = document.getElementById("handleBtn");
+
         // 新文件名生成逻辑
         function generateWindowsSafeFileName(originalName) {
             // 1. 替换非法字符为下划线，并保留合法字符
@@ -164,6 +193,21 @@
 
             // 6. 最终组合
             return `${truncatedName}${uniquePart}${extension}`;
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
         }
 
         // 页面加载时恢复图片
@@ -265,6 +309,9 @@
                         // 将COS的图片地址赋值给预览图片的src属性
                         preview.src = fileUrl;
 
+                        // 开始分割按钮启动
+                        handleBtn.disabled = false;
+
                         // 把数据返回后端
                         $.post("{% url 'web:project_file_post' project_id=project_id %}", {
                             "name": fileName,
@@ -291,7 +338,6 @@
             }
         });
 
-
         // 模拟处理功能
         // 获取类名为'btn-success'的第一个按钮元素，并添加点击事件监听器
         document.querySelector('.btn-success').addEventListener('click', function () {
@@ -300,13 +346,35 @@
             const downloadBtn = document.getElementById('download-btn');
             const resultImage = document.getElementById('result-image');
 
-            // 模拟处理延迟的交互逻辑
+            // 获取选中的模型值
+            const modelSelect = document.getElementById('model-select');
+            const selectedModel = modelSelect.value;
+
             // 禁用当前按钮防止重复点击
             this.disabled = true;
 
             // 更新按钮文字为加载状态，包含旋转加载图标（假设使用Bootstrap图标）
             this.innerHTML = '<div class="spinner-border spinner-border-sm"></div> 处理中...';
 
+            const csrftoken = getCookie('csrftoken');
+
+            // 成功将模型类型传送到后台
+            $.ajax({
+                url: "{% url 'web:project_handle' project_id=project_id %}",
+                type: "POST",
+                headers: {
+                    'X-CSRFToken': csrftoken
+                },
+                data: {
+                    model: selectedModel,
+                },
+                dataType: "JSON",
+                success: function (res) {
+                    console.log(res);
+                }
+            })
+
+            {% comment %}
             // 使用setTimeout模拟异步处理过程（实际开发中应替换为真实API调用）
             setTimeout(() => {
                 // 恢复按钮可点击状态
@@ -319,7 +387,7 @@
                 downloadBtn.disabled = false;
 
                 // 将预览图片的src赋值给结果图片（此处为模拟，实际需替换处理后的图片）
-                resultImage.src = document.getElementById('preview-image').src;
+                resultImage.src = localStorage.getItem(STORAGE_KEY);
 
                 // 显示结果图片元素
                 resultImage.classList.remove('d-none');
@@ -328,9 +396,23 @@
                 document.getElementById('result-placeholder').classList.add('d-none');
 
             }, 2000); // 模拟2秒处理时长
+            {% endcomment %}
+        });
+
+        document.getElementById('download-btn').addEventListener('click', function () {
+            const resultUrl = localStorage.getItem(`project_${projectId}_result_url`);
+            if (!resultUrl) {
+                alert('暂无可用结果');
+                return;
+            }
+            const a = document.createElement('a');
+            a.href = resultUrl;
+            a.download = 'segmented_image_' + Date.now() + '.png';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         });
 
     </script>
 
 {% endblock %}
-
