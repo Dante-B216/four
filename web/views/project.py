@@ -1,5 +1,7 @@
 from django.http import JsonResponse
 from django.shortcuts import render, HttpResponse, redirect
+from django.views.decorators.csrf import csrf_exempt
+
 from web.forms.project import ProjectModelForm
 
 from web import models
@@ -55,6 +57,7 @@ def project_star(request, project_type, project_id):
     return HttpResponse("请求错误。")
 
 
+# 取消星标
 def project_delete_star(request, project_type, project_id):
     if project_type == 'my':
         models.Project.objects.filter(id=project_id, user=request.tracer).update(star=False)
@@ -63,14 +66,35 @@ def project_delete_star(request, project_type, project_id):
 
 
 def project_image_segmentation(request, project_id):
-    return render(request, "web/project_image_segmentation.html")
+    return render(request, "web/project_image_segmentation.html", {"project_id": project_id})
 
 
 def project_manage(request, project_id):
     return render(request, "web/project_manage.html")
 
 
+# 获取临时凭证
 def cos_credential(request):
     data_dict = get_credential(request.tracer.bucket, request.tracer.region)
     print("data_dict", data_dict)
     return JsonResponse(data_dict)
+
+
+# 将成功上传到COS的文件写入数据库
+@csrf_exempt
+def project_file_post(request, project_id):
+
+    name = request.POST.get('name')
+    path = request.POST.get('path')
+
+    if not name or not path:
+        return JsonResponse({'status': False, 'data': "文件错误。"})
+
+    # 写入数据库
+    instance = models.OriginalImage.objects.create(original_img_name=name, original_img_path=path,
+                                                   project_id=project_id)
+    result = {
+        "path": instance.original_img_path
+    }
+
+    return JsonResponse({'status': True, 'data': result})

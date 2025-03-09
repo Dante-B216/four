@@ -117,6 +117,75 @@
 {% block js %}
     <script src="{% static "web/js/cos-js-sdk-v5.min.js" %}"></script>
     <script>
+        // 获取project_id
+        const projectId = "{{ project_id }}";
+
+        // 动态生成一个唯一的存储键名，用于隔离localStorage中不同项目的图片URL
+        // 键名格式为project_XXX_image_url
+        const STORAGE_KEY = `project_${projectId}_image_url`;
+
+        // 获取用于预览图片的<img>元素
+        const preview = document.getElementById('preview-image');
+
+        // 获取文件文字提示元素
+        const label = document.getElementById('upload-label');
+
+        // 获取上传区域DOM元素
+        const uploadArea = document.querySelector('.upload-area');
+
+        // 获取进度条元素
+        const uploadProgress = document.getElementById("uploadProgress");
+
+        // 新文件名生成逻辑
+        function generateWindowsSafeFileName(originalName) {
+            // 1. 替换非法字符为下划线，并保留合法字符
+            const cleanedName = originalName
+                .replace(/[\\/:*?"<>|]/g, '_') // 替换Windows禁止字符
+                .replace(/\s+/g, '_')         // 空格转下划线
+                .replace(/\.{2,}/g, '.')      // 禁止连续多个点
+                .replace(/^[. ]+|[. ]+$/g, ''); // 去除首尾空格和点
+
+            // 2. 分离文件名与扩展名
+            const extIndex = cleanedName.lastIndexOf('.');
+            let nameWithoutExt = extIndex > 0 ? cleanedName.slice(0, extIndex) : cleanedName;
+            const extension = extIndex > 0 ? cleanedName.slice(extIndex) : '';
+
+            // 3. 处理空文件名的情况（例如输入全是非法字符）
+            if (nameWithoutExt === '') nameWithoutExt = 'unnamed_file';
+
+            // 4. 生成唯一标识
+            const timestamp = Date.now();
+            const random = Math.floor(Math.random() * 10000);
+            const uniquePart = `_${timestamp}_${random}`;
+
+            // 5. 组合文件名并限制长度
+            const maxBaseLength = 255 - uniquePart.length - extension.length;
+            const truncatedName = nameWithoutExt.slice(0, maxBaseLength);
+
+            // 6. 最终组合
+            return `${truncatedName}${uniquePart}${extension}`;
+        }
+
+        // 页面加载时恢复图片
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // 从localStorage中获取本项目的图片url
+            const savedUrl = localStorage.getItem(STORAGE_KEY);
+
+            if (savedUrl) {
+                // 禁用上传区域
+                uploadArea.classList.add('upload-disabled');  // 添加禁用样式
+                uploadArea.onclick = null;                    // 移除点击事件
+
+                // 显示图片
+                preview.src = savedUrl;
+                preview.classList.remove('d-none');
+                label.classList.add('d-none');
+            } else {
+                preview.classList.add('d-none');
+                label.classList.remove('d-none');
+            }
+        });
 
         // 图片预览功能
         // 获取ID为'upload-input'的文件上传输入元素，并为其添加'change'事件监听器
@@ -125,24 +194,11 @@
             // 从事件对象中获取用户选择的第一个文件（因为文件输入可能支持多选，此处取第一个）
             const file = e.target.files[0];
 
-            // 获取用于预览图片的<img>元素
-            const preview = document.getElementById('preview-image');
-
-            // 获取文件文字提示元素
-            const label = document.getElementById('upload-label');
-
-            // 获取上传区域DOM元素
-            const uploadArea = document.querySelector('.upload-area');
-
-            // 获取进度条元素
-            const uploadProgress = document.getElementById("uploadProgress");
-
             // 检查用户是否确实选择了文件（避免空值情况）
             if (file) {
                 // 禁用上传区域
                 uploadArea.classList.add('upload-disabled');  // 添加禁用样式
                 uploadArea.onclick = null;                    // 移除点击事件
-
 
                 // 获取COS临时凭证
                 var cos_object = new COS({
@@ -168,7 +224,8 @@
                     }
                 });
 
-                var fileName = file.name;
+                var fileName = file.name;       // 文件名
+                var uniqueFileName = generateWindowsSafeFileName(fileName);  // 唯一文件名
 
                 $("#uploadProgress").find(".name").text(fileName);
 
@@ -176,8 +233,8 @@
                 cos_object.uploadFile({
                     Bucket: "{{ request.tracer.bucket }}",
                     Region: "{{ request.tracer.region }}",
-                    Key: fileName,
-                    Body: file,
+                    Key: uniqueFileName,      // 唯一文件名
+                    Body: file,     // 文件对象
                     onProgress: function (progressData) {
                         console.log("文件上传进度---->", fileName, JSON.stringify(progressData));
                         // 进度条显示
@@ -189,26 +246,15 @@
                 }, function (err, data) {
                     console.log(err || data);
 
-                    // 上传失败
-                    if (err) {
-                        $("#uploadProgress").find(".progress-error").text("上传失败。")
-
-                        uploadArea.classList.remove('upload-disabled');
-
-                        // 恢复点击事件
-                        uploadArea.onclick = () => document.getElementById('upload-input').click();
-
-                        // 3秒后隐藏进度条
-                        setTimeout(() => uploadProgress.classList.add("d-none"), 3000);
-                    } else {    // 上传成功
-
+                    if (data && data.statusCode === 200) {
                         // 3秒后隐藏进度条
                         setTimeout(() => uploadProgress.classList.add("d-none"), 3000);
 
                         const fileUrl = `https://${data.Location}`;     // 上传到COS的图片地址
 
-                        // 将COS的图片地址赋值给预览图片的src属性
-                        preview.src = fileUrl
+                        // localStorage中会以键名存储对应项目的图片URL
+                        // {"project_123_image_url": "https://example.com/image.jpg","project_456_image_url": "https://example.com/other-image.png"}
+                        localStorage.setItem(STORAGE_KEY, fileUrl);
 
                         // 移除预览图片元素的'd-none'类
                         preview.classList.remove('d-none');
@@ -216,10 +262,29 @@
                         // 给文件文字提示元素添加'd-none'类，隐藏提示文字
                         label.classList.add('d-none');
 
+                        // 将COS的图片地址赋值给预览图片的src属性
+                        preview.src = fileUrl;
 
-                        // 把url保存到数据库
+                        // 把数据返回后端
+                        $.post("{% url 'web:project_file_post' project_id=project_id %}", {
+                            "name": fileName,
+                            "path": fileUrl,
+                        }, function (res) {
+                            console.log(res)
+                        })
 
+                    } else {
 
+                        $("#uploadProgress").find(".progress-error").text("上传失败。")
+
+                        // 恢复上传区域
+                        uploadArea.classList.remove('upload-disabled');
+
+                        // 恢复点击事件
+                        uploadArea.onclick = () => document.getElementById('upload-input').click();
+
+                        // 3秒后隐藏进度条
+                        setTimeout(() => uploadProgress.classList.add("d-none"), 3000);
                     }
 
                 })

@@ -138,9 +138,9 @@ def delete_file_list(bucket, region, key_list):
         Delete=objects,  # 文件列表
     )
 
+
 # 获取临时凭证
 def get_credential(bucket, region, ):
-
     config = {
         # 临时密钥有效时长，单位是秒，1800s=30min
         'duration_seconds': 1800,
@@ -178,8 +178,10 @@ def get_credential(bucket, region, ):
 
     try:
         sts = Sts(config)
-        response = sts.get_credential()     # 临时凭证
+        response = sts.get_credential()  # 临时凭证
         print('get data : ' + json.dumps(dict(response), indent=4))
-        return response     # 返回临时凭证
+        return response  # 返回临时凭证
     except Exception as e:
         print(e)
+
+

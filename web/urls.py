@@ -73,4 +73,7 @@ urlpatterns = [
     # 获取临时凭证
     path('project/cos/credential/', project.cos_credential, name='cos_credential'),
 
+    # 把文件写入数据库
+    re_path(r'^project/manage/(?P<project_id>\d+)/post/$', project.project_file_post, name='project_file_post'),
+
 ]
