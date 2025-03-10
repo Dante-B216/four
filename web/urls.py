@@ -71,6 +71,10 @@ urlpatterns = [
     re_path(r'^project/image_segmentation/(?P<project_id>\d+)/handle/$', project.project_handle,
             name='project_handle'),
 
+    # 下载文件
+    re_path(r'^project/image_segmentation/(?P<project_id>\d+)/file_download/(?P<original_img_id>\d+)/$', project.file_download,
+            name='file_download'),
+
     # 项目管理
     re_path(r'^project/manage/(?P<project_id>\d+)/$', project.project_manage, name='project_manage'),
 

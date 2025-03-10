@@ -65,6 +65,7 @@
                         <button id="handleBtn" type="submit" class="btn btn-success w-100 py-2" disabled>
                             开始分割
                         </button>
+
                     </div>
                 </div>
             </div>
@@ -84,6 +85,7 @@
                             <img id="result-image" class="img-fluid d-none" alt="结果图像">
 
                         </div>
+
                         <button class="btn btn-primary w-100 mt-4 py-2" disabled id="download-btn">
                             <i class="bi bi-download"></i> 下载结果
                         </button>
@@ -164,6 +166,16 @@
 
         // 获取开始分割按钮
         const handleBtn = document.getElementById("handleBtn");
+
+        // 获取下载结果按钮
+        const downloadBtn = document.getElementById("download-btn");
+
+        // 全局状态对象
+        const downLoadObject = {
+            originalImgId: null,
+            originalImgPath: null,
+            downloadUrl: null
+        };
 
         // 新文件名生成逻辑
         function generateWindowsSafeFileName(originalName) {
@@ -315,9 +327,17 @@
                         // 把数据返回后端
                         $.post("{% url 'web:project_file_post' project_id=project_id %}", {
                             "name": fileName,
+                            "key": uniqueFileName,
                             "path": fileUrl,
+
                         }, function (res) {
-                            console.log(res)
+                            console.log(res.data.original_img_id);
+                            console.log(res.data.original_img_path);
+                            console.log(res.data.download_url);
+
+                            downLoadObject.originalImgId = res.data.original_img_id;
+                            downLoadObject.originalImgPath = res.data.original_img_path;
+                            downLoadObject.downloadUrl = res.data.download_url;
                         })
 
                     } else {
@@ -369,8 +389,18 @@
                     model: selectedModel,
                 },
                 dataType: "JSON",
+
                 success: function (res) {
-                    console.log(res);
+
+                    downloadBtn.disabled = false;
+
+                    resultImage.src = localStorage.getItem(STORAGE_KEY);
+
+                    // 显示结果图片元素
+                    resultImage.classList.remove('d-none');
+
+                    // 隐藏文字提示
+                    document.getElementById('result-placeholder').classList.add('d-none');
                 }
             })
 
@@ -400,17 +430,10 @@
         });
 
         document.getElementById('download-btn').addEventListener('click', function () {
-            const resultUrl = localStorage.getItem(`project_${projectId}_result_url`);
-            if (!resultUrl) {
-                alert('暂无可用结果');
-                return;
-            }
-            const a = document.createElement('a');
-            a.href = resultUrl;
-            a.download = 'segmented_image_' + Date.now() + '.png';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+
+            // 向后端发送下载文件请求
+            window.location.href = downLoadObject.downloadUrl;
+
         });
 
     </script>

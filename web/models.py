@@ -45,6 +45,8 @@ class OriginalImage(models.Model):
 
     original_img_name = models.CharField(verbose_name='本地上传图像名称', max_length=255)
 
+    original_img_key = models.CharField(verbose_name='COS图片名称', max_length=255)
+
     original_img_path = models.CharField(verbose_name='本地上传图像路径', max_length=255)
 
     original_img_time = models.DateTimeField(verbose_name='上传时间', auto_now_add=True)
