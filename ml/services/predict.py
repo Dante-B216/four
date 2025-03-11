@@ -165,7 +165,7 @@ if __name__ == '__main__':
     ]
     args = get_args()    # 解析命令行参数
 
-    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')    # 配置日志输出格式
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')  # 配置日志输出格式
 
     in_files = args.input    # 输入文件列表
 

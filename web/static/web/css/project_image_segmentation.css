@@ -15,7 +15,12 @@
     object-fit: contain;
 }
 
-#result-image {
+#left-result-image {
+    max-height: 250px;
+    object-fit: contain;
+}
+
+#right-result-image {
     max-height: 250px;
     object-fit: contain;
 }
@@ -84,3 +89,5 @@
 .upload-progress .card-body .name{
     margin-bottom: 16px;
 }
+
+
