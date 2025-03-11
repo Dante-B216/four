@@ -15,3 +15,5 @@ settings.py
 
 
 ml/netModels/*.pth
+
+ml/test_img/*.png
