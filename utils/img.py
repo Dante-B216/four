@@ -167,6 +167,7 @@ def overlay_mask_on_image(original_img, mask, color=(255, 0, 0), alpha=0.3,
 
     return Image.fromarray(result_rgb)
 
+
 def get_output_filename(file_path):
     """生成输出文件名列表。
 
@@ -193,6 +194,7 @@ def get_output_filename(file_path):
 
     # 返回新文件名
     return new_file_name
+
 
 def get_overlay_filename(file_path):
     """生成输出文件名列表。
@@ -276,35 +278,36 @@ def segment_image(img_path, model_path):
     # 使用模型进行分割预测
     mask = predict_img(net=net, full_img=current_img, device=device)
 
-    print("Unique mask values:", np.unique(mask))       # Unique mask values: [0 1]
+    print("Unique mask values:", np.unique(mask))  # Unique mask values: [0 1]
 
-    print(f"mask数组数据类型: {mask.dtype}")      # mask数组数据类型: int64
-    print(f"mask数组数值范围: {mask.min()}~{mask.max()}")     # mask数组数值范围: 0~1
+    print(f"mask数组数据类型: {mask.dtype}")  # mask数组数据类型: int64
+    print(f"mask数组数值范围: {mask.min()}~{mask.max()}")  # mask数组数值范围: 0~1
 
     # 保存结果掩码文件
-    out_filename = out_file  # 获取当前输出文件名
-
-    result = mask_to_image(mask, mask_values)  # 将预测的掩码转换为图像格式
-
-    result.save(out_filename)  # 保存转换后的图像到指定路径
-
-    logging.info(f'Mask saved to {out_filename}')  # 记录日志，提示掩码已保存
+    # out_filename = out_file  # 获取当前输出文件名
+    #
+    # result = mask_to_image(mask, mask_values)  # 将预测的掩码转换为图像格式
+    #
+    # result.save(out_filename)  # 保存转换后的图像到指定路径
+    #
+    # logging.info(f'Mask saved to {out_filename}')  # 记录日志，提示掩码已保存
 
     # 生成并保存叠加图像
     overlay = overlay_mask_on_image(current_img, mask)
-    overlay_filename = get_overlay_filename(in_file)
+    overlay_filename = "web/views/handle_img/" + get_overlay_filename(in_file)
     overlay.save(overlay_filename)
     logging.info(f'Overlay image saved to {overlay_filename}')
 
+    return overlay_filename
+
     # 可视化图像和对应的掩码
-    logging.info(f'Visualizing results for image {in_file}, close to continue...')  # 提示用户当前图像正在可视化
+    # logging.info(f'Visualizing results for image {in_file}, close to continue...')  # 提示用户当前图像正在可视化
+    #
+    # plot_img_and_mask(current_img, mask)  # 显示原始图像及其预测掩码
 
-    plot_img_and_mask(current_img, mask)  # 显示原始图像及其预测掩码
 
-
-if __name__ == '__main__':
-
-    img = "D:/xuniCpan/Graduation Design/graduationDesign/ml/test_img/P17-0080.png"
-    model_path = "D:/xuniCpan/Graduation Design/graduationDesign/ml/netModels/unet_s.pth"
-
-    segment_image(img_path=img, model_path=model_path)
+# if __name__ == '__main__':
+#     img = "D:/xuniCpan/Graduation Design/graduationDesign/ml/test_img/P17-0080.png"
+#     model_path = "D:/xuniCpan/Graduation Design/graduationDesign/ml/netModels/unet_s.pth"
+#
+#     segment_image(img_path=img, model_path=model_path)

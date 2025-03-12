@@ -68,12 +68,16 @@ urlpatterns = [
             name='project_image_segmentation'),
 
     # 进行图像分割
-    re_path(r'^project/image_segmentation/(?P<project_id>\d+)/handle/$', project.project_handle,
+    re_path(r'^project/image_segmentation/(?P<project_id>\d+)/handle/(?P<original_img_id>\d+)/$', project.project_handle,
             name='project_handle'),
 
-    # 下载文件
-    re_path(r'^project/image_segmentation/(?P<project_id>\d+)/file_download/(?P<original_img_id>\d+)/$', project.file_download,
-            name='file_download'),
+    # 下载上传文件
+    re_path(r'^project/image_segmentation/(?P<project_id>\d+)/file_download/(?P<original_img_id>\d+)/$', project.original_img_file_download,
+            name='original_img_file_download'),
+
+    # 下载结果文件
+    re_path(r'^project/image_segmentation/(?P<project_id>\d+)/file_download/(?P<original_img_id>\d+)/(?P<result_img_id>\d+)$', project.result_img_file_download,
+            name='result_img_file_download'),
 
     # 项目管理
     re_path(r'^project/manage/(?P<project_id>\d+)/$', project.project_manage, name='project_manage'),

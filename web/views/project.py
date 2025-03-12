@@ -17,6 +17,10 @@ from utils.tencent.cos import get_credential
 
 import requests
 
+from utils.tencent.cos import download_file
+from utils.img import segment_image
+from utils.tencent.cos import upload_file
+
 
 def project_add(request):
     if request.method == 'GET':
@@ -105,7 +109,8 @@ def project_file_post(request, project_id):
     result = {
         "original_img_id": instance.id,
         "original_img_path": instance.original_img_path,
-        "download_url": reverse("web:file_download", kwargs={'project_id': project_id, 'original_img_id': instance.id})
+        "download_url": reverse("web:original_img_file_download",
+                                kwargs={'project_id': project_id, 'original_img_id': instance.id})
     }
 
     print("result", result)
@@ -114,15 +119,77 @@ def project_file_post(request, project_id):
 
 
 # 图像分割
-def project_handle(request, project_id):
+def project_handle(request, project_id, original_img_id):
     model_type = request.POST.get("model")
     print("model_type:", model_type)
-    return JsonResponse({'status': True})
+
+    if model_type == '1':
+        model_path = "ml/netModels/unet.pth"
+    elif model_type == '2':
+        model_path = "ml/netModels/unet_c.pth"
+    elif model_type == '3':
+        model_path = "ml/netModels/unet_s.pth"
+    elif model_type == '4':
+        model_path = "ml/netModels/unet_cs.pth"
+    elif model_type == '5':
+        model_path = "ml/netModels/unet++.pth"
+    elif model_type == '6':
+        model_path = "ml/netModels/u2net.pth"
+
+    print("model_path", model_path)
+
+    # 获取要分割的图片对象
+    original_img = models.OriginalImage.objects.filter(id=original_img_id, project_id=project_id).first()
+
+    # 获取要分割的图片COS名称
+    original_img_key = original_img.original_img_key
+    print("original_img_path", original_img_key)
+
+    # 把图片下载到本地
+    download_file(request.tracer.bucket, request.tracer.region, original_img_key)
+
+    # 图片本地路径
+    original_img_local_path = "web/views/handle_img/" + original_img_key
+    print("original_img_local_path", original_img_local_path)
+
+    # 分割结果路径
+    result_img_local_path = segment_image(original_img_local_path, model_path)
+    print("result_img_local_path", result_img_local_path)
+
+    # 获取分割结果文件名
+    result_img_key = os.path.basename(result_img_local_path)
+
+    # 重点：用 with open 打开文件，传递文件对象给 Body
+    with open(result_img_local_path, "rb") as file_object:  # 二进制模式读取
+        result_img_path = upload_file(request.tracer.bucket, request.tracer.region, file_object,
+                                      result_img_key)
+        print("result_img_path", result_img_path)
+
+    # 写入数据库
+    instance = models.SegmentationResult.objects.create(model_type=model_type, result_img_path=result_img_path,
+                                                        result_img_key=result_img_key,
+                                                        original_img_id=original_img_id)
+
+    # 删除本地文件
+    os.remove(result_img_local_path)
+    os.remove(original_img_local_path)
+
+    # 把数据传回给前端
+    result = {
+        "result_img_id": instance.id,
+        "result_img_path": instance.result_img_path,
+        "download_url": reverse("web:result_img_file_download",
+                                kwargs={'project_id': project_id, 'original_img_id': original_img_id,
+                                        'result_img_id': instance.id})
+    }
+
+    print("result", result)
+
+    return JsonResponse({'status': True, 'data': result})
 
 
-# 下载文件
-def file_download(request, project_id, original_img_id):
-
+# 下载上传文件
+def original_img_file_download(request, project_id, original_img_id):
     # 获取要下载的文件对象
     file_object = models.OriginalImage.objects.filter(id=original_img_id, project_id=project_id).first()
 
@@ -135,5 +202,23 @@ def file_download(request, project_id, original_img_id):
 
     # 设置响应头
     response["Content-Disposition"] = "attachment; filename={}".format(file_object.original_img_key)
+
+    return response
+
+
+# 下载结果文件
+def result_img_file_download(request, project_id, original_img_id, result_img_id):
+    # 获取要下载的文件对象
+    file_object = models.SegmentationResult.objects.filter(id=result_img_id, original_img_id=original_img_id).first()
+
+    # 获取要下载的文件对象的COS路径
+    res = requests.get(file_object.result_img_path)
+
+    data = res.content
+
+    response = HttpResponse(data)
+
+    # 设置响应头
+    response["Content-Disposition"] = "attachment; filename={}".format(file_object.result_img_key)
 
     return response

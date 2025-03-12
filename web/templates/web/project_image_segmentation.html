@@ -21,7 +21,7 @@
         <!-- 主内容区 -->
         <div class="row g-4 p-4">
             <!-- 上传列 -->
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <div class="card shadow-sm h-100">
                     <div class="card-body">
                         <h5 class="card-title mb-4">图像上传</h5>
@@ -45,7 +45,7 @@
             </div>
 
             <!-- 控制列 -->
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <div class="card shadow-sm h-100">
                     <div class="card-body">
                         <h5 class="card-title mb-4">处理设置</h5>
@@ -166,7 +166,19 @@
 
         // 动态生成一个唯一的存储键名，用于隔离localStorage中不同项目的图片URL
         // 键名格式为project_XXX_image_url
-        const STORAGE_KEY = `project_${projectId}_image_url`;
+        // const STORAGE_KEY = `project_${projectId}_image_url`;
+
+        // 上传图片键名
+        const UPLOAD_IMAGE_KEY = `project_${projectId}_upload_image_url`;
+        // localStorage.setItem(UPLOAD_IMAGE_KEY, uploadImageUrl);
+
+        // 结果图片键名
+        const DOWNLOAD_IMAGE_KEY = `project_${projectId}_download_image_url`;
+        // localStorage.setItem(DOWNLOAD_IMAGE_KEY, downloadImageUrl);
+
+        // 结果图片下载地址
+        const RESULT_DOWNLOAD_KEY = `project_${projectId}_result_download_url`;
+        // localStorage.setItem(RESULT_DOWNLOAD_KEY, url);
 
         // 获取用于预览图片的<img>元素
         const preview = document.getElementById('preview-image');
@@ -183,14 +195,24 @@
         // 获取开始分割按钮
         const handleBtn = document.getElementById("handleBtn");
 
+        // 用于存储开始分割按钮原始内容
+        let btnOriginalHTML;
+
         // 获取下载结果按钮
         const downloadBtn = document.getElementById("download-btn");
+
+        // 获取结果显示图片元素
+        const resultImage = document.getElementById('result-image');
 
         // 全局状态对象
         const downLoadObject = {
             originalImgId: null,
             originalImgPath: null,
-            downloadUrl: null
+            originalDownloadUrl: null,
+
+            resultImgId: null,
+            resultImgPath: null,
+            resultDownloadUrl: null,
         };
 
         // 新文件名生成逻辑
@@ -241,8 +263,15 @@
         // 页面加载时恢复图片
         document.addEventListener('DOMContentLoaded', function () {
 
-            // 从localStorage中获取本项目的图片url
-            const savedUrl = localStorage.getItem(STORAGE_KEY);
+            // 从localStorage中获取上传图片url
+            const savedUrl = localStorage.getItem(UPLOAD_IMAGE_KEY);
+            // 从localStorage中获取结果图片url
+            const resultUrl = localStorage.getItem(DOWNLOAD_IMAGE_KEY);
+
+            console.log("savedUrl")
+            console.log(savedUrl)
+            console.log("resultUrl")
+            console.log(resultUrl)
 
             if (savedUrl) {
                 // 禁用上传区域
@@ -253,10 +282,46 @@
                 preview.src = savedUrl;
                 preview.classList.remove('d-none');
                 label.classList.add('d-none');
+
+
+                if (resultUrl) {
+                    // 开始分割按钮禁用
+                    handleBtn.disabled = true;
+
+                    // 启用下载按钮
+                    downloadBtn.disabled = false;
+
+                    // 显示结果图片
+                    resultImage.src = resultUrl;
+
+                    // 显示结果图片元素
+                    resultImage.classList.remove('d-none');
+
+                    // 隐藏文字提示
+                    document.getElementById('result-placeholder').classList.add('d-none');
+
+                }
+                else {
+                    // 开始分割按钮启动
+                    handleBtn.disabled = false;
+
+                    // 禁用下载按钮
+                    downloadBtn.disabled = true;
+
+                    // 隐藏结果图片元素
+                    resultImage.classList.add('d-none');
+
+                    // 显示文字提示
+                    document.getElementById('result-placeholder').classList.remove('d-none');
+                }
+
+
             } else {
                 preview.classList.add('d-none');
                 label.classList.remove('d-none');
             }
+
+
         });
 
         // 图片预览功能
@@ -326,7 +391,8 @@
 
                         // localStorage中会以键名存储对应项目的图片URL
                         // {"project_123_image_url": "https://example.com/image.jpg","project_456_image_url": "https://example.com/other-image.png"}
-                        localStorage.setItem(STORAGE_KEY, fileUrl);
+                        // localStorage.setItem(STORAGE_KEY, fileUrl);
+                        localStorage.setItem(UPLOAD_IMAGE_KEY, fileUrl);
 
                         // 移除预览图片元素的'd-none'类
                         preview.classList.remove('d-none');
@@ -337,8 +403,6 @@
                         // 将COS的图片地址赋值给预览图片的src属性
                         preview.src = fileUrl;
 
-                        // 开始分割按钮启动
-                        handleBtn.disabled = false;
 
                         // 把数据返回后端
                         $.post("{% url 'web:project_file_post' project_id=project_id %}", {
@@ -353,7 +417,10 @@
 
                             downLoadObject.originalImgId = res.data.original_img_id;
                             downLoadObject.originalImgPath = res.data.original_img_path;
-                            downLoadObject.downloadUrl = res.data.download_url;
+                            downLoadObject.originalDownloadUrl = res.data.download_url;
+
+                            // 开始分割按钮启动
+                            handleBtn.disabled = false;
                         })
 
                     } else {
@@ -379,8 +446,8 @@
         document.querySelector('.btn-success').addEventListener('click', function () {
 
             // 获取下载按钮元素和结果显示图片元素
-            const downloadBtn = document.getElementById('download-btn');
-            const resultImage = document.getElementById('result-image');
+            // const downloadBtn = document.getElementById('download-btn');
+            // const resultImage = document.getElementById('result-image');
 
             // 获取选中的模型值
             const modelSelect = document.getElementById('model-select');
@@ -389,14 +456,19 @@
             // 禁用当前按钮防止重复点击
             this.disabled = true;
 
+            // 保存当前按钮原始内容
+            const originalHTML = this.innerHTML;
+
             // 更新按钮文字为加载状态，包含旋转加载图标（假设使用Bootstrap图标）
             this.innerHTML = '<div class="spinner-border spinner-border-sm"></div> 处理中...';
 
             const csrftoken = getCookie('csrftoken');
 
+            const handle_url = "/web/project/image_segmentation/" + projectId + "/handle/" + downLoadObject.originalImgId + "/";
+
             // 成功将模型类型传送到后台
             $.ajax({
-                url: "{% url 'web:project_handle' project_id=project_id %}",
+                url: handle_url,
                 type: "POST",
                 headers: {
                     'X-CSRFToken': csrftoken
@@ -408,9 +480,20 @@
 
                 success: function (res) {
 
+                    downLoadObject.resultImgId = res.data.result_img_id;
+                    downLoadObject.resultImgPath = res.data.result_img_path;
+                    downLoadObject.resultDownloadUrl = res.data.download_url;
+
+                    localStorage.setItem(DOWNLOAD_IMAGE_KEY, res.data.result_img_path);
+                    localStorage.setItem(RESULT_DOWNLOAD_KEY, res.data.download_url);
+
+                    handleBtn.innerHTML = originalHTML; // 还原原始内容
+
+                    // 启用下载按钮
                     downloadBtn.disabled = false;
 
-                    resultImage.src = localStorage.getItem(STORAGE_KEY);
+                    // 显示结果图片
+                    resultImage.src = downLoadObject.resultImgPath;
 
                     // 显示结果图片元素
                     resultImage.classList.remove('d-none');
@@ -448,7 +531,7 @@
         document.getElementById('download-btn').addEventListener('click', function () {
 
             // 向后端发送下载文件请求
-            window.location.href = downLoadObject.downloadUrl;
+            window.location.href = localStorage.getItem(RESULT_DOWNLOAD_KEY);
 
         });
 

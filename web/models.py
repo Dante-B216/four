@@ -68,6 +68,8 @@ class SegmentationResult(models.Model):
 
     result_img_path = models.CharField(verbose_name='心内膜分割结果图像', max_length=255)    # 心内膜
 
+    result_img_key = models.CharField(verbose_name='COS图片名称', max_length=255)
+
     result_img_time = models.DateTimeField(verbose_name='分割完成时间', auto_now_add=True)
 
     original_img = models.ForeignKey(OriginalImage, on_delete=models.CASCADE)  # 外键
