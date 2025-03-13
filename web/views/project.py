@@ -20,6 +20,7 @@ import requests
 from utils.tencent.cos import download_file
 from utils.img import segment_image
 from utils.tencent.cos import upload_file
+from utils.tencent.cos import delete_file
 
 
 def project_add(request):
@@ -42,11 +43,11 @@ def project_add(request):
 
 
 # 展示项目
-def project_list(request):
+def project_list(request, user_id):
     if request.method == 'GET':
         project_dict = {'star': [], 'my': []}
 
-        my_project_list = models.Project.objects.filter(user=request.tracer)
+        my_project_list = models.Project.objects.filter(user_id=user_id)
 
         for row in my_project_list:
             if row.star:
@@ -61,7 +62,8 @@ def project_list(request):
 def project_star(request, project_type, project_id):
     if project_type == 'my':
         models.Project.objects.filter(id=project_id, user=request.tracer).update(star=True)
-        return redirect("/web/project/list")
+        url = reverse('web:project_list', kwargs={'user_id': request.tracer.id})
+        return redirect(url)
     return HttpResponse("请求错误。")
 
 
@@ -69,7 +71,8 @@ def project_star(request, project_type, project_id):
 def project_delete_star(request, project_type, project_id):
     if project_type == 'my':
         models.Project.objects.filter(id=project_id, user=request.tracer).update(star=False)
-        return redirect("/web/project/list")
+        url = reverse('web:project_list', kwargs={'user_id': request.tracer.id})
+        return redirect(url)
     return HttpResponse("请求错误。")
 
 
@@ -80,8 +83,51 @@ def project_image_segmentation(request, project_id):
     return render(request, "web/project_image_segmentation.html", context)
 
 
+# 图像分割项目展示
 def project_manage(request, project_id):
-    return render(request, "web/project_manage.html")
+    # 获取项目对象
+    project_object = models.Project.objects.filter(id=project_id, user_id=request.tracer.id).first()
+
+    # 获取上传图像对象
+    original_img_object = models.OriginalImage.objects.filter(project_id=project_id).first()
+
+    # 获取结果图像对象
+    result_img_object = models.SegmentationResult.objects.filter(original_img_id=original_img_object.id).first()
+
+    # 获取项目信息
+    project_id = project_object.id
+    project_name = project_object.name
+    project_description = project_object.description
+    project_time = project_object.project_time
+
+    # 获取上传图片信息
+    original_img_id = original_img_object.id
+    original_img_path = original_img_object.original_img_path
+    original_img_time = original_img_object.original_img_time
+
+    # 获取结果图片信息
+    result_img_id = result_img_object.id
+    model_type = result_img_object.get_model_type_display
+    result_img_path = result_img_object.result_img_path
+    result_img_time = result_img_object.result_img_time
+
+    context = {
+        "project_id": project_id,
+        "project_name": project_name,
+        "project_description": project_description,
+        "project_time": project_time,
+        "original_img_id": original_img_id,
+        "original_img_path": original_img_path,
+        "original_img_time": original_img_time,
+        "result_img_id": result_img_id,
+        "model_type": model_type,
+        "result_img_path": result_img_path,
+        "result_img_time": result_img_time,
+    }
+
+    print(context)
+
+    return render(request, "web/project_manage.html", context)
 
 
 # 获取临时凭证
@@ -91,7 +137,7 @@ def cos_credential(request):
     return JsonResponse(data_dict)
 
 
-# 将成功上传到COS的文件写入数据库
+# 将前端成功上传到COS的文件写入数据库
 @csrf_exempt
 def project_file_post(request, project_id):
     name = request.POST.get('name')
@@ -222,3 +268,32 @@ def result_img_file_download(request, project_id, original_img_id, result_img_id
     response["Content-Disposition"] = "attachment; filename={}".format(file_object.result_img_key)
 
     return response
+
+
+def project_delete(request, project_id):
+    # 获取原图
+    original_img_object = models.OriginalImage.objects.filter(project_id=project_id).first()
+    original_img_id = original_img_object.id
+    original_img_key = original_img_object.original_img_key
+
+    # 获取结果图
+    result_img_object = models.SegmentationResult.objects.filter(original_img_id=original_img_id).first()
+    result_img_key = result_img_object.result_img_key
+
+    # 删除COS图片
+    original_img_result = delete_file(request.tracer.bucket, request.tracer.region, original_img_key)
+
+    result_img_result = delete_file(request.tracer.bucket, request.tracer.region, result_img_key)
+
+    print("original_img_result", original_img_result)
+    print("result_img_result", result_img_result)
+
+    if original_img_result != None and result_img_result != None:
+        models.Project.objects.filter(id=project_id, user_id=request.tracer.id).delete()
+
+        url = reverse('web:project_list', kwargs={'user_id': request.tracer.id})  # 跳转回项目列表
+
+    else:
+        url = reverse('web:project_manage', kwargs={'project_id': project_id})  # 跳转回项目列表
+
+    return redirect(url)

@@ -1,13 +1,126 @@
 {% extends 'web/layout/basic.html' %}
 {% load static %}
 
-{% block title %}图像分割中心{% endblock %}
+{% block title %}项目管理 - {{ project_name }}{% endblock %}
 
 {% block css %}
-
+    <link rel="stylesheet" href="{% static 'web/css/project_manage.css' %}">
 {% endblock %}
 
 {% block content %}
+    <div class="container py-5" style="padding-top: 15px !important;">
+        <!-- 项目信息 -->
+        <div class="project-header p-4 mb-5" style="margin-bottom: 20px !important;">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="fw-bold">
+                        项目名称：{{ project_name }}
+                    </h3>
+                    <p class="text-muted" style="margin-top: 20px;margin-bottom: 10px">
+                        创建时间：{{ project_time|date:"Y-m-d H:i" }}</p>
+                    <p class="text-muted" style="margin-bottom: 10px">项目描述：{{ project_description }}</p>
+                    <p class="text-muted" style="margin-bottom: 10px">模型类型：{{ model_type }}</p>
+                </div>
+
+                <button type="submit" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                        data-bs-target="#deleteModal">
+                    <i class="fas fa-trash me-2"></i>删除项目
+                </button>
+
+                <!--
+                <a type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                        data-bs-target="#deleteModal">
+                    <i class="fas fa-trash me-2"></i>删除项目
+                </a>
+                -->
+
+                <!-- Modal -->
+                <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel"
+                     aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5 fw-bold" id="exampleModalLabel">删除项目</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                确认删除项目【{{ project_name }}】？
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                <!--
+                                <button type="button" class="btn btn-danger">确认</button>
+                                -->
+                                <a type="button" class="btn btn-danger" href="{% url 'web:project_delete' project_id=project_id%}">确认</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 图像展示 -->
+        <div class="row g-4">
+            <div class="col-12">
+                <div class="img-card p-3" style="box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);">
+                    <div class="row g-4">
+                        <!-- 原图 -->
+                        <div class="col-md-6">
+                            <div class="card h-100" style="padding-top: 20px !important; border: 2px dashed #dee2e6;">
+                                <img src="{{ original_img_path }}"
+                                     class="card-img-top img-fluid"
+                                     alt="原图"
+                                     style="max-height: 400px; object-fit: contain;">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-file-upload me-2"></i>原图
+                                    </h5>
+                                    <p class="text-muted">
+                                        <i class="fas fa-clock me-2"></i>
+                                        上传时间：{{ original_img_time|date:"Y-m-d H:i" }}
+                                    </p>
+                                    <a href="{% url 'web:original_img_file_download' project_id=project_id original_img_id=original_img_id %}"
+                                       download
+                                       class="btn btn-outline-primary download-btn w-75">
+                                        下载
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 结果图 -->
+                        <div class="col-md-6">
+                            <div class="card shadow-sm h-100"
+                                 style="padding-top: 20px !important;border: 2px dashed #dee2e6;">
+                                <img src="{{ result_img_path }}"
+                                     class="card-img-top img-fluid"
+                                     alt="结果图"
+                                     style="max-height: 400px; object-fit: contain;">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-magic me-2"></i>结果图
+                                    </h5>
+
+                                    <p class="text-muted">
+                                        <i class="fas fa-clock me-2"></i>
+                                        完成时间：{{ result_img_time|date:"Y-m-d H:i" }}
+                                    </p>
+                                    <a href="{% url 'web:result_img_file_download' project_id=project_id original_img_id=original_img_id result_img_id=result_img_id %}"
+                                       download
+                                       class="btn btn-outline-success download-btn w-75">
+                                        下载
+                                    </a>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}
 

@@ -84,10 +84,12 @@ def delete_file(bucket, region, key):
 
     client = CosS3Client(config)
 
-    client.delete_object(
+    data = client.delete_object(
         Bucket=bucket,
         Key=key,  # 文件名
     )
+
+    return data
 
 
 # 桶批量删除文件

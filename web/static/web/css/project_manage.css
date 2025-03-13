@@ -1,0 +1,11 @@
+.project-header {
+    /*background: #ffffff;*/
+    border-radius: 15px;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.img-card {
+    transition: transform 0.3s;
+    border: 1px solid #dee2e6;;
+    border-radius: 10px;
+}

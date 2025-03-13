@@ -36,7 +36,8 @@ urlpatterns = [
     path('project/add/', project.project_add, name='project_add'),
 
     # 展示项目
-    path('project/list/', project.project_list, name='project_list'),
+    # path('project/list/', project.project_list, name='project_list'),
+    re_path(r'^(?P<user_id>\d+)/project/list/$', project.project_list, name='project_list'),
 
     # wiki
     re_path(r'^(?P<user_id>\d+)/wiki/$', wiki.wiki, name='wiki'),
@@ -68,19 +69,27 @@ urlpatterns = [
             name='project_image_segmentation'),
 
     # 进行图像分割
-    re_path(r'^project/image_segmentation/(?P<project_id>\d+)/handle/(?P<original_img_id>\d+)/$', project.project_handle,
+    re_path(r'^project/image_segmentation/(?P<project_id>\d+)/handle/(?P<original_img_id>\d+)/$',
+            project.project_handle,
             name='project_handle'),
 
     # 下载上传文件
-    re_path(r'^project/image_segmentation/(?P<project_id>\d+)/file_download/(?P<original_img_id>\d+)/$', project.original_img_file_download,
+    re_path(r'^project/image_segmentation/(?P<project_id>\d+)/file_download/(?P<original_img_id>\d+)/$',
+            project.original_img_file_download,
             name='original_img_file_download'),
 
     # 下载结果文件
-    re_path(r'^project/image_segmentation/(?P<project_id>\d+)/file_download/(?P<original_img_id>\d+)/(?P<result_img_id>\d+)$', project.result_img_file_download,
-            name='result_img_file_download'),
+    re_path(
+        r'^project/image_segmentation/(?P<project_id>\d+)/file_download/(?P<original_img_id>\d+)/(?P<result_img_id>\d+)$',
+        project.result_img_file_download,
+        name='result_img_file_download'),
 
     # 项目管理
     re_path(r'^project/manage/(?P<project_id>\d+)/$', project.project_manage, name='project_manage'),
+
+    # 删除项目
+    re_path(r'^project/manage/delete/(?P<project_id>\d+)/$', project.project_delete,
+            name='project_delete'),
 
     # 获取临时凭证
     path('project/cos/credential/', project.cos_credential, name='cos_credential'),
