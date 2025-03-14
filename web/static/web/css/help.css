@@ -1,0 +1,69 @@
+.help-container {
+    height: calc(100vh - 60px); /* 根据导航栏高度调整 */
+}
+
+.left-menu {
+    background-color: #F8F9FA;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.list-group{
+    background-color: #F8F9FA !important;
+    padding-top: 20px;
+}
+
+.doc-item {
+    color: #000000 !important;
+    border: none !important;
+    text-decoration: none !important;
+    padding: 12px 20px !important;
+    padding-left: 60px !important;
+    background-color: #F8F9FA !important;
+}
+
+.doc-item:hover {
+    color: #56B8EB !important;
+    background-color: #F8F9FA !important;
+}
+
+/* 去除点击时的蓝色外框 */
+.doc-item:focus {
+    background-color: #F8F9FA !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* 补充：如果仍有残留效果可以添加 */
+a:focus, a:active {
+    background-color: #F8F9FA !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.doc-item.active {
+    background-color: #F8F9FA !important;
+    color: #56B8EB !important;
+    font-weight: 500;
+}
+
+.right-content {
+    background-color: white;
+    height: 100%;
+    overflow-y: auto;
+    padding: 30px;
+    margin-left:60px;
+}
+
+.content-section {
+    display: none;
+}
+
+.content-section.active {
+    display: block;
+}
+
+.doc-icon {
+    margin-right: 8px;
+    width: 20px;
+}

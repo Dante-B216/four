@@ -1,0 +1,58 @@
+{% extends 'web/layout/basic.html' %}
+{% load static %}
+
+{% block title %}个人中心{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'web/css/personal_center.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row"> <!-- 添加行容器 -->
+            <div class="col-sm-2">
+                <div class="card text-center"> <!-- 移除固定宽度 -->
+                    <div class="card-header fw-bold" style="background-color: white !important;">
+                        个人中心
+                    </div>
+                    <div class="list-group list-group-flush">
+                        <a href="{% url 'web:personal_center' user_id=request.tracer.id %}"
+                           class="list-group-item">我的资料</a>
+                        <a href="{% url 'web:personal_center_change_pwd' user_id=request.tracer.id %}"
+                           class="list-group-item">修改密码</a>
+                        <a href="{% url 'web:personal_center_delete' user_id=request.tracer.id %}"
+                           class="delete_user list-group-item">注销账号</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-9">
+                <div class="card">
+                    <div class="card-header fw-bold" style="background-color: #F8F9FA !important;">
+                        <i class="fa-solid fa-user-gear"></i>
+                        注销账号
+                    </div>
+                    <div class="card-body">
+                        <form class="row g-3" method="post">
+                            {% csrf_token %}
+                            <div class="col-auto">
+                                <label class="form-control" style="border: 0px !important; margin-right:10px;">用户名</label>
+                            </div>
+                            <div class="col-auto">
+                                <input type="text" class="form-control" placeholder="请输入" name="user_name">
+                                <span class="error-msg"
+                                      style="color: rgb(219,26,33); font-size: 14px;margin-left: 3px;margin-top: 3px;">{{ error }}</span>
+                            </div>
+                            <div class="col-auto">
+                                <button type="submit" class="btn btn-danger mb-3">注销</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+
+{% endblock %}

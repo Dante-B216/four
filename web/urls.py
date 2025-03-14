@@ -32,6 +32,15 @@ urlpatterns = [
     # 帮助文档
     path('help/', account.help, name='help'),
 
+    # personal_center个人中心
+    re_path(r'^(?P<user_id>\d+)/personal_center/$', project.personal_center, name='personal_center'),
+
+    # personal_center个人中心
+    re_path(r'^(?P<user_id>\d+)/personal_center/delete/$', project.personal_center_delete, name='personal_center_delete'),
+
+    # personal_center个人中心
+    re_path(r'^(?P<user_id>\d+)/personal_center/change_pwd/$', project.personal_center_change_pwd, name='personal_center_change_pwd'),
+
     # 创建项目
     path('project/add/', project.project_add, name='project_add'),
 

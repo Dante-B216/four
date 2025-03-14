@@ -10,6 +10,7 @@ import json
 import os
 
 from sts.sts import Sts, CIScope, Scope
+from qcloud_cos import CosServiceError
 
 
 # 创建桶
@@ -203,5 +204,59 @@ def download_file(bucket, region, key):
     response = client.download_file(
         Bucket=bucket,
         Key=key,
-        DestFilePath="web/views/handle_img/"+key
+        DestFilePath="web/views/handle_img/" + key
     )
+
+
+# 删除桶
+def delete_bucket(bucket, region):
+    # 删除所有文件
+    # 删除所有碎片
+
+    secret_id = settings.COS_SECRET_ID
+
+    secret_key = settings.COS_SECRET_KEY
+
+    config = CosConfig(Region=region, SecretId=secret_id, SecretKey=secret_key)
+
+    client = CosS3Client(config)
+
+    try:
+        # 找到所有文件并删除
+        while True:
+            part_object = client.list_objects(bucket)
+
+            contents = part_object.get('Contents')
+
+            if not contents:
+                break
+
+            objects = {
+                "Quiet": "true",
+                "Object": [{"Key": item["Key"]} for item in contents]
+            }
+
+            # 批量删除
+            client.delete_objects(bucket, objects)
+
+            if part_object["IsTruncated"] == "false":
+                break
+
+        # 找到所有碎片并删除
+        while True:
+            part_uploads = client.list_multipart_uploads(bucket)
+            uploads = part_uploads.get("Upload")
+            if not uploads:
+                break
+
+            for item in uploads:
+                client.abort_multipart_upload(bucket, item["Key"], item["UploadId"])
+
+            if part_object["IsTruncated"] == "false":
+                break
+
+        # 删除桶
+        client.delete_bucket(bucket)
+
+    except CosServiceError as e:
+        print(e)

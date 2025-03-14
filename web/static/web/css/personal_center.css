@@ -1,0 +1,129 @@
+.card {
+    margin-top: 50px;
+}
+
+.card-body {
+    margin-top: 40px;
+    margin-bottom: 100px;
+    margin-left: 40px;
+    margin-right: 40px;
+}
+
+.list-group a:hover {
+    background-color: #F8F9FA;
+}
+
+.my_message {
+    background-color: #F8F9FA;
+}
+
+.delete_user {
+    background-color: #F8F9FA;
+}
+
+.change_pwd {
+    background-color: #F8F9FA;
+}
+
+/* 用户资料卡片 */
+.profile-content {
+    padding: 2rem 3rem !important;
+}
+
+/* 头像区域 */
+.icon-wrapper {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 信息列表样式 */
+.info-list {
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.info-list .list-group-item {
+    border: none;
+    border-bottom: 1px solid #e9ecef;
+    padding: 1.5rem;
+    transition: background-color 0.2s;
+}
+
+.info-list .list-group-item:last-child {
+    border-bottom: 0;
+}
+
+/* 图标统一宽度 */
+.info-list .fa-fw {
+    width: 1.5em;
+}
+
+/* 文字间距调整 */
+.info-list .small {
+    margin-bottom: 0.25rem;
+}
+
+/* 修改密码表单样式 */
+.change-pwd-form {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    margin-bottom: 0.5rem;
+    display: block;
+    color: #495057;
+}
+
+.input-group-text {
+    background-color: #fff;
+    border-right: none;
+    color: #6c757d;
+}
+
+.form-control {
+    padding-left: 0.5rem;
+    transition: border-color 0.15s ease-in-out;
+}
+
+.form-control:focus {
+    box-shadow: none;
+    border-color: #86b7fe;
+}
+
+.btn-primary {
+    background-color: #0d6efd;
+    border: none;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    padding-left: 15px;
+    padding-right: 15px;
+    margin-top: 30px;
+}
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+    transform: translateY(-1px);
+}
+
+/* 提示文字 */
+.form-text {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+}
+
+/* 输入框聚焦时图标颜色变化 */
+.input-group:focus-within .input-group-text {
+    border-color: #86b7fe;
+    color: #0d6efd;
+}

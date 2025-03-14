@@ -79,7 +79,7 @@
                             {{ request.tracer.user_name }}
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">个人中心</a></li>
+                            <li><a class="dropdown-item" href="{% url 'web:personal_center' user_id=request.tracer.id %}">个人中心</a></li>
                             <li><a class="dropdown-item" href="/web/project/add/">图像分割</a></li>
                             <li><a class="dropdown-item" href="{% url 'web:project_list' user_id=request.tracer.id %}">项目管理</a>
                             </li>

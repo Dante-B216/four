@@ -1,16 +1,180 @@
 {% extends 'web/layout/basic.html' %}
 {% load static %}
 
-{% block title %}帮助文档{% endblock %}
+{% block title %}图像分割系统帮助文档{% endblock %}
 
 {% block css %}
-
+    <link rel="stylesheet" href="{% static 'web/css/help.css' %}">
 {% endblock %}
 
 {% block content %}
+    <div class="container-fluid help-container">
+        <div class="row h-100">
+            <!-- 左侧菜单 -->
+            <div class="col-md-2 left-menu">
+                <div class="list-group list-group-flush">
+                    <a href="#system-overview" class="list-group-item list-group-item-action doc-item active">
+                        <i class="fa-solid fa-bolt"></i>
+                        系统概述
+                    </a>
+                    <a href="#user-register" class="list-group-item list-group-item-action doc-item">
+                        <i class="fa-solid fa-user-plus"></i>
+                        用户注册
+                    </a>
+                    <a href="#user-login" class="list-group-item list-group-item-action doc-item">
+                        <i class="fa-solid fa-user-check"></i>
+                        用户登录
+                    </a>
+                    <a href="#personal-center" class="list-group-item list-group-item-action doc-item">
+                        <i class="fa-solid fa-user"></i>
+                        个人中心
+                    </a>
+                    <a href="#image-seg" class="list-group-item list-group-item-action doc-item">
+                        <i class="fa-solid fa-image"></i>
+                        图像分割
+                    </a>
+                    <a href="#project-mgmt" class="list-group-item list-group-item-action doc-item">
+                        <i class="fa-solid fa-folder-open"></i>
+                        项目管理
+                    </a>
+                    <a href="#wiki-mgmt" class="list-group-item list-group-item-action doc-item">
+                        <i class="fa-solid fa-pen-nib"></i>
+                        wiki
+                    </a>
+                </div>
+            </div>
 
+            <!-- 右侧内容 -->
+            <div class="col-md-9 right-content">
+                <!-- 系统概述 -->
+                <div id="system-overview" class="content-section active">
+                    <h3 class="mb-4 fw-bold">系统概述</h3>
+                    <div style="height: 20px;"></div>
+                    <p>✨本系统是基于深度学习的图像分割平台。</p>
+                    <div style="height: 20px;"></div>
+                    <p>🔆主要功能包括：</p>
+                    <p>1️⃣支持<span class="text-success">"多种格式"</span>的图像上传。</p>
+                    <p>2️⃣提供<span class="text-success">"实时"</span>图像分割处理。</p>
+                    <p>3️⃣可视化分割结果对比。</p>
+                    <p>4️⃣项目管理与历史记录追溯。</p>
+                </div>
+
+                <!-- 用户注册 -->
+                <div id="user-register" class="content-section">
+                    <h3 class="mb-4 fw-bold">用户注册</h3>
+                    <div style="height: 20px;"></div>
+                    <p>✨注册步骤：</p>
+                    <p>1️⃣点击导航栏<span class="text-success">"注册"</span>按钮。</p>
+                    <p>2️⃣填写用户名、邮箱、手机号、密码等基本信息。</p>
+                    <p>3️⃣用户名、邮箱、手机号都可作为账户的唯一登录凭证喔，所以用户名、邮箱、手机号不能已注册~</p>
+                    <div style="height: 20px;"></div>
+                    <p>⚠️注意事项：</p>
+                    <p>▪️用户名只能包含字母、数字、下划线或短横线，长度为6-16位。</p>
+                    <p>▪️密码必须包含字母、数字，并且长度在8到32个字符之间。</p>
+                </div>
+
+                <!-- 用户登录 -->
+                <div id="user-login" class="content-section">
+                    <h3 class="mb-4 fw-bold">用户登录</h3>
+                    <div style="height: 20px;"></div>
+                    <p>✨登录步骤：</p>
+                    <p>1️⃣点击导航栏<span class="text-success">"登录"</span>按钮。</p>
+                    <p>2️⃣填写用户名、邮箱、手机号、密码基本信息。</p>
+                    <p>3️⃣填写图片验证码。</p>
+                    <div style="height: 20px;"></div>
+                    <p>🔆登录方式：</p>
+                    <p>1️⃣用户名密码登录。</p>
+                    <p>2️⃣手机号密码登录。</p>
+                    <p>3️⃣邮箱密码登录。</p>
+                    <div style="height: 20px;"></div>
+                    <p>⚠️注意事项：</p>
+                    <p>▪️点击图片验证码可以更换验证码。</p>
+                    <p>▪️右下角可以切换登录方式。</p>
+                </div>
+
+                <!-- 个人中心 -->
+                <div id="personal-center" class="content-section">
+                    <h3 class="mb-4 fw-bold">个人中心</h3>
+                    <div style="height: 20px;"></div>
+                    <p>✨主要功能：</p>
+                    <p>1️⃣我的资料：显示用户名、用户邮箱、用户手机号。</p>
+                    <p>2️⃣修改密码。</p>
+                    <p>3️⃣注销账号。</p>
+                    <div style="height: 20px;"></div>
+                    <p>⚠️注意事项：</p>
+                    <p>▪️新密码必须包含字母、数字，并且长度在8到32个字符之间。</p>
+                    <p>▪️注销账号操作不可逆喔~</p>
+                </div>
+
+                <!-- 图像分割 -->
+                <div id="image-seg" class="content-section">
+                    <h3 class="mb-4 fw-bold">图像分割</h3>
+                    <div style="height: 20px;"></div>
+                    <p>✨操作流程：</p>
+                    <p>1️⃣创建新项目。</p>
+                    <p>2️⃣填写项目名称和项目描述。</p>
+                    <p>3️⃣点击确认进入图像分割中心。</p>
+                    <p>4️⃣上传图像（支持JPG/PNG格式）。</p>
+                    <p>5️⃣选择分割模型（默认使用unet）。</p>
+                    <p>6️⃣点击开始分割按钮。</p>
+                    <p>6️⃣下载处理结果图像。</p>
+                    <div style="height: 20px;"></div>
+                    <p>⚠️注意事项：</p>
+                    <p>▪️项目名称不能重复。</p>
+                    <p>▪️仅保存上传图像和处理结果图像都存在的项目，缺失则项目丢失。</p>
+                </div>
+
+                <!-- 项目管理 -->
+                <div id="project-mgmt" class="content-section">
+                    <h3 class="mb-4 fw-bold">项目管理</h3>
+                    <div style="height: 20px;"></div>
+                    <p>✨项目管理功能包括：</p>
+                    <p>1️⃣展示用户图像分割项目列表。</p>
+                    <p>2️⃣项目星标。</p>
+                    <p>3️⃣项目取消星标。</p>
+                    <p>4️⃣点击查看项目。</p>
+                    <p>5️⃣下载原图和结果图。</p>
+                    <p>6️⃣删除项目。</p>
+                </div>
+
+                <!-- wiki -->
+                <div id="wiki-mgmt" class="content-section">
+                    <h3 class="mb-4 fw-bold">wiki</h3>
+                    <div style="height: 20px;"></div>
+                    <p>✨wiki功能包括：</p>
+                    <p>1️⃣左边区域显示创建的文章目录。</p>
+                    <p>2️⃣点击文章标题右边区域显示文章内容。</p>
+                    <p>3️⃣新建文章：输入文章标题、文章内容、选择父文章。</p>
+                    <p>4️⃣对已经打开的文章，可以编辑文章和删除文章。</p>
+
+                    <div style="height: 20px;"></div>
+                    <p>⚠️注意事项：</p>
+                    <p>▪️文章标题不能重复。</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block js %}
+    <script>
+        $(document).ready(function () {
+            // 左侧菜单点击事件
+            $('.doc-item').click(function (e) {
+                e.preventDefault();
+
+                // 移除所有active状态
+                $('.doc-item').removeClass('active');
+                // 添加当前active状态
+                $(this).addClass('active');
+
+                // 切换内容显示
+                const target = $(this).attr('href');
+                $('.content-section').removeClass('active');
+                $(target).addClass('active');
+            });
+        });
+    </script>
 
 {% endblock %}

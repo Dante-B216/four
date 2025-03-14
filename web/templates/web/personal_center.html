@@ -1,0 +1,68 @@
+{% extends 'web/layout/basic.html' %}
+{% load static %}
+
+{% block title %}个人中心{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'web/css/personal_center.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row"> <!-- 添加行容器 -->
+            <div class="col-sm-2">
+                <div class="card text-center"> <!-- 移除固定宽度 -->
+                    <div class="card-header fw-bold" style="background-color: white !important;">
+                        个人中心
+                    </div>
+                    <div class="list-group list-group-flush">
+                        <a href="{% url 'web:personal_center' user_id=request.tracer.id %}"
+                           class="my_message list-group-item">我的资料</a>
+                        <a href="{% url 'web:personal_center_change_pwd' user_id=request.tracer.id %}"
+                           class="list-group-item">修改密码</a>
+                        <a href="{% url 'web:personal_center_delete' user_id=request.tracer.id %}"
+                           class="list-group-item">注销账户</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-9">
+                <div class="card">
+                    <div class="card-header fw-bold" style="background-color: #F8F9FA !important;">
+                        <i class="fa-solid fa-address-card"></i>
+                        我的资料
+                    </div>
+                    <div class="card-body profile-content">
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="icon-wrapper bg-primary rounded-circle me-3">
+                                <i class="fas fa-user fa-lg text-white"></i>
+                            </div>
+                            <h3 class="mb-0">{{ user_name }}</h3>
+                        </div>
+
+                        <div class="info-list">
+                            <div class="list-group-item d-flex align-items-center">
+                                <i class="fas fa-envelope fa-lg text-muted me-3"></i>
+                                <div>
+                                    <div class="text-muted small">注册邮箱</div>
+                                    <div class="fw-bold">{{ user_email }}</div>
+                                </div>
+                            </div>
+                            <div class="list-group-item d-flex align-items-center">
+                                <i class="fas fa-mobile-alt fa-lg text-muted me-3"></i>
+                                <div>
+                                    <div class="text-muted small">绑定手机</div>
+                                    <div class="fw-bold">{{ user_phone }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+
+{% endblock %}

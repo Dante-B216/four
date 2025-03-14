@@ -21,6 +21,9 @@ from utils.tencent.cos import download_file
 from utils.img import segment_image
 from utils.tencent.cos import upload_file
 from utils.tencent.cos import delete_file
+from utils.tencent.cos import delete_bucket
+from utils import encrypt
+from django.contrib import messages
 
 
 def project_add(request):
@@ -47,9 +50,22 @@ def project_list(request, user_id):
     if request.method == 'GET':
         project_dict = {'star': [], 'my': []}
 
+        # 我创建的所有项目
         my_project_list = models.Project.objects.filter(user_id=user_id)
 
-        for row in my_project_list:
+        # 原图和结果图都存在的项目
+        data_list = []
+
+        # 仅展示原图和结果图都存在的项目
+        for project_object in my_project_list:
+            original_img_object = models.OriginalImage.objects.filter(project_id=project_object.id).first()
+            if original_img_object:
+                result_img_object = models.SegmentationResult.objects.filter(
+                    original_img_id=original_img_object.id).first()
+                if result_img_object:
+                    data_list.append(project_object)
+
+        for row in data_list:
             if row.star:
                 project_dict['star'].append(row)
             else:
@@ -270,6 +286,7 @@ def result_img_file_download(request, project_id, original_img_id, result_img_id
     return response
 
 
+# 删除项目
 def project_delete(request, project_id):
     # 获取原图
     original_img_object = models.OriginalImage.objects.filter(project_id=project_id).first()
@@ -297,3 +314,80 @@ def project_delete(request, project_id):
         url = reverse('web:project_manage', kwargs={'project_id': project_id})  # 跳转回项目列表
 
     return redirect(url)
+
+
+# 个人中心
+def personal_center(request, user_id):
+    user_object = models.UserInfo.objects.filter(id=user_id).first()
+    user_name = user_object.user_name
+    user_email = user_object.user_email
+    user_phone = user_object.user_phone
+    context = {
+        'user_id': user_id,
+        'user_name': user_name,
+        'user_email': user_email,
+        'user_phone': user_phone,
+    }
+    return render(request, "web/personal_center.html", context)
+
+
+# 注销用户
+def personal_center_delete(request, user_id):
+    if request.method == 'GET':
+        return render(request, "web/personal_center_delete.html")
+
+    if request.method == 'POST':
+        user_name = request.POST.get('user_name')
+        if not user_name or user_name != request.tracer.user_name:
+            return render(request, "web/personal_center_delete.html", {"error": "用户名错误。"})
+
+        delete_bucket(request.tracer.bucket, request.tracer.region)
+
+        models.UserInfo.objects.filter(id=request.tracer.id).delete()
+
+        request.session.flush()
+
+        return redirect("web:index")
+
+
+# 修改密码
+def personal_center_change_pwd(request, user_id):
+    if request.method == 'GET':
+        return render(request, "web/personal_center_change_pwd.html")
+
+    if request.method == 'POST':
+        error = None
+        success = False
+
+        # 获取当前用户对象
+        user = models.UserInfo.objects.filter(id=request.tracer.id).first()
+
+        if not user:
+            return redirect('web:login_name')
+
+        # 获取表单数据
+        old_password = request.POST.get('old_password')
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+
+        # 验证原密码
+        if encrypt.md5(old_password) != user.user_pw:
+            error = "原密码错误。"
+        else:
+            # 前端验证规则（与注册一致）
+            if new_password != confirm_password:
+                error = "两次输入的新密码不一致。"
+            elif not (8 <= len(new_password) <= 32):
+                error = "密码长度需在8-32位之间。"
+            elif not any(char.isalpha() for char in new_password) or not any(char.isdigit() for char in new_password):
+                error = "密码必须包含字母和数字。"
+            else:
+                # 更新密码
+                user.user_pw = encrypt.md5(new_password)
+                user.save()
+                success = True
+        return render(request, "web/personal_center_change_pwd.html", {
+            'error': error,
+            'success': success,
+            'user': user
+        })

@@ -371,3 +371,4 @@ class LoginEmailModelForm(BootstrapForm, forms.Form):
         return code
 
 
+# class EditPwdModelForm(BootstrapForm, forms.Form):

@@ -1,0 +1,125 @@
+{% extends 'web/layout/basic.html' %}
+{% load static %}
+
+{% block title %}个人中心{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'web/css/personal_center.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row"> <!-- 添加行容器 -->
+            <div class="col-sm-2">
+                <div class="card text-center"> <!-- 移除固定宽度 -->
+                    <div class="card-header fw-bold" style="background-color: white !important;">
+                        个人中心
+                    </div>
+                    <div class="list-group list-group-flush">
+                        <a href="{% url 'web:personal_center' user_id=request.tracer.id %}"
+                           class="list-group-item">我的资料</a>
+                        <a href="{% url 'web:personal_center_change_pwd' user_id=request.tracer.id %}"
+                           class="list-group-item change_pwd">修改密码</a>
+                        <a href="{% url 'web:personal_center_delete' user_id=request.tracer.id %}"
+                           class="list-group-item">注销账户</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-9">
+                <div class="card">
+                    <div class="card-header fw-bold" style="background-color: #F8F9FA !important;">
+                        <i class="fa-solid fa-pen-nib"></i>
+                        修改密码
+                    </div>
+                    <div class="card-body">
+                        <form method="post" class="change-pwd-form" novalidate>
+                            {% csrf_token %}
+                            <!-- 原密码 -->
+                            <div class="form-group mb-4">
+                                <label class="form-label fw-bold">原密码</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                                    <input type="password" class="form-control"
+                                           name="old_password"
+                                           required
+                                           placeholder="请输入原密码">
+                                </div>
+                            </div>
+
+                            <!-- 新密码 -->
+                            <div class="form-group mb-4">
+                                <label class="form-label fw-bold">新密码</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fa-solid fa-key"></i></span>
+                                    <input type="password" class="form-control"
+                                           name="new_password"
+                                           required
+                                           minlength="8"
+                                           maxlength="32"
+                                           pattern="^(?=.*[A-Za-z])(?=.*\d).+"
+                                           placeholder="请输入新密码（8-32位，包含字母和数字）">
+                                </div>
+                                <small class="form-text text-muted">密码必须包含字母和数字，且长度为8-32位</small>
+                            </div>
+
+                            <!-- 确认新密码 -->
+                            <div class="form-group mb-4">
+                                <label class="form-label fw-bold">确认新密码</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fa-solid fa-check-double"></i></span>
+                                    <input type="password" class="form-control"
+                                           name="confirm_password"
+                                           required
+                                           minlength="8"
+                                           maxlength="32"
+                                           placeholder="请再次输入新密码">
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary mt-3 w-100">
+                                <i class="fa-solid fa-floppy-disk me-2"></i>提交修改
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        // 浏览器原生验证提示
+        document.querySelector('.change-pwd-form').addEventListener('submit', function (e) {
+            // 密码一致性验证
+            const newPassword = document.querySelector('[name="new_password"]').value;
+            const confirmPassword = document.querySelector('[name="confirm_password"]').value;
+
+            if (newPassword !== confirmPassword) {
+                document.querySelector('[name="confirm_password"]').setCustomValidity('两次输入的密码不一致。');
+            } else {
+                document.querySelector('[name="confirm_password"]').setCustomValidity('');
+            }
+        });
+
+        // 实时清除确认密码验证状态
+        document.querySelector('[name="confirm_password"]').addEventListener('input', function () {
+            this.setCustomValidity('');
+        });
+
+        // 后端错误提示
+        {% if error %}
+            setTimeout(() => {
+                alert('错误: {{ error }}。');
+            }, 100);
+        {% endif %}
+
+        {% if success %}
+            setTimeout(() => {
+                alert('密码修改成功，请重新登录。');
+                window.location.href = "{% url 'web:login_name' %}";
+            }, 100);
+        {% endif %}
+    </script>
+
+{% endblock %}
